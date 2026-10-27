@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// 仅打开产品内固定声明过的 HTTPS 文档，不携带任何本机资料。
+/// 仅打开固定的 HTTPS 版本发布页，不携带任何本机资料。
 abstract final class AnchExternalDocuments {
-  static const privacyPolicyUrl = 'https://anch-docs.pages.dev/privacy/';
+  static const latestReleaseUrl =
+      'https://github.com/setlater/anch/releases/latest';
 
   static const _channel = MethodChannel('anch/external_url');
 
-  static Future<void> openPrivacyPolicy(BuildContext context) =>
-      _open(context, url: privacyPolicyUrl, failureMessage: '无法打开隐私政策网页，请稍后重试');
-
-  static Future<void> _open(
-    BuildContext context, {
-    required String url,
-    required String failureMessage,
-  }) async {
+  static Future<void> openLatestRelease(BuildContext context) async {
     try {
       final opened = await _channel.invokeMethod<bool>(
         'openExternalUrl',
-        <String, Object>{'url': url},
+        <String, Object>{'url': latestReleaseUrl},
       );
       if (opened == true || !context.mounted) return;
     } on PlatformException {
@@ -26,6 +20,6 @@ abstract final class AnchExternalDocuments {
     }
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(failureMessage)));
+    ).showSnackBar(const SnackBar(content: Text('无法打开版本发布页，请稍后重试')));
   }
 }

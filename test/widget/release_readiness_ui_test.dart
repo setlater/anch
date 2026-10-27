@@ -30,11 +30,18 @@ void main() {
         _app(theme: AnchTheme.dark, home: const AboutPage()),
       );
       await tester.pumpAndSettle();
-      await tester.drag(find.byType(ListView), const Offset(0, -240));
-      await tester.pump();
-
+      await tester.scrollUntilVisible(find.text('版本 1.0.0（1）'), 100);
       expect(find.text('版本 1.0.0（1）'), findsOneWidget);
+      await tester.scrollUntilVisible(find.textContaining('支付密码'), 100);
       expect(find.textContaining('支付密码'), findsOneWidget);
+      for (final key in [
+        'about_latest_release',
+        'about_open_source_licenses',
+      ]) {
+        final entry = find.byKey(ValueKey(key));
+        await tester.scrollUntilVisible(entry, 100);
+        expect(entry.hitTestable(), findsOneWidget);
+      }
       expect(tester.takeException(), isNull);
     });
 

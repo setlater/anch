@@ -7,6 +7,7 @@ import '../../core/theme/anch_spacing.dart';
 import '../../core/widgets/anch_app_scaffold.dart';
 import '../../core/widgets/anch_icon.dart';
 import '../../core/widgets/anch_subpage_app_bar.dart';
+import 'external_document_launcher.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -76,6 +77,14 @@ class AboutPage extends StatelessWidget {
           ),
           const SizedBox(height: AnchSpacing.xl),
           _AboutActionRow(
+            actionKey: const ValueKey('about_latest_release'),
+            label: '查看最新版本',
+            description: '在系统浏览器中查看 GitHub 发布与下载',
+            onTap: () => AnchExternalDocuments.openLatestRelease(context),
+          ),
+          const SizedBox(height: AnchSpacing.md),
+          _AboutActionRow(
+            actionKey: const ValueKey('about_open_source_licenses'),
             label: '第三方许可',
             description: '查看组件与图标的版权和许可',
             onTap: () => showLicensePage(
@@ -92,11 +101,13 @@ class AboutPage extends StatelessWidget {
 
 class _AboutActionRow extends StatelessWidget {
   const _AboutActionRow({
+    required this.actionKey,
     required this.label,
     required this.description,
     required this.onTap,
   });
 
+  final Key actionKey;
   final String label;
   final String description;
   final VoidCallback onTap;
@@ -107,7 +118,7 @@ class _AboutActionRow extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        key: const ValueKey('about_open_source_licenses'),
+        key: actionKey,
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: AnchSpacing.md),

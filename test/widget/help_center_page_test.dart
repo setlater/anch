@@ -13,7 +13,7 @@ import 'package:flutter/foundation.dart';
 
 void main() {
   group('帮助手册入口与既有离线说明文案红线安全测试', () {
-    testWidgets('0. MinePage 优先展示设置入口，离线说明位于页尾', (tester) async {
+    testWidgets('0. 设置页保留主要入口，不显示隐私政策和页尾保存说明', (tester) async {
       final runtime = RuntimeProvider.create(
         const AnchSecurityRuntimeConfig(
           mode: AnchSecurityMode.dev,
@@ -45,21 +45,11 @@ void main() {
       expect(find.text('管理'), findsNothing);
       expect(find.text('查看说明'), findsNothing);
 
-      await tester.dragUntilVisible(
-        find.byKey(const ValueKey('mine_privacy_policy_entry')),
-        find.byType(ListView),
-        const Offset(0, -200),
-      );
-      expect(find.text('隐私政策'), findsOneWidget);
-      expect(find.text('在系统浏览器中查看数据处理说明'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('关于安册'), 100);
       expect(find.text('关于安册'), findsOneWidget);
-      final storageNote = find.text('资料仅保存在本机，不联网，无云同步。');
-      await tester.scrollUntilVisible(storageNote, 100);
-      expect(
-        tester.getTopLeft(find.text('关于安册')).dy,
-        lessThan(tester.getTopLeft(storageNote).dy),
-      );
+      expect(find.text('隐私政策'), findsNothing);
+      expect(find.text('在系统浏览器中查看数据处理说明'), findsNothing);
+      expect(find.text('资料仅保存在本机，不联网，无云同步。'), findsNothing);
     });
 
     testWidgets('安全设置入口沿用统一的设置行样式', (tester) async {
@@ -297,93 +287,79 @@ void main() {
       }
     });
 
-    testWidgets('6.1 隐私政策通过系统浏览器打开固定 HTTPS 地址', (WidgetTester tester) async {
+    testWidgets('关于页仅在点击后打开最新发布，三档宽度下入口可访问', (tester) async {
       const channel = MethodChannel('anch/external_url');
-      MethodCall? receivedCall;
+      final calls = <MethodCall>[];
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (call) async {
-            receivedCall = call;
+            calls.add(call);
             return true;
           });
       addTearDown(() {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockMethodCallHandler(channel, null);
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
       });
+      tester.view.devicePixelRatio = 1;
 
-      final runtime = RuntimeProvider.create(
-        const AnchSecurityRuntimeConfig(
-          mode: AnchSecurityMode.dev,
-          useEncryptedDatabase: false,
-          enableSecureWindow: false,
-          enablePrivacyShieldOverlay: false,
-          enableAppLockGate: false,
-          isFormalBlocked: false,
-        ),
-      );
-      await tester.pumpWidget(
-        wrapTest(const MaterialApp(home: MinePage()), runtime),
-      );
-      await tester.pumpAndSettle();
+      for (final width in [320.0, 600.0, 900.0]) {
+        tester.view.physicalSize = Size(width, 800);
+        await tester.pumpWidget(const SizedBox.shrink());
+        calls.clear();
+        await tester.pumpWidget(
+          MaterialApp(
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(width == 320 ? 2 : 1)),
+              child: child!,
+            ),
+            home: const AboutPage(),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(calls, isEmpty);
 
-      final privacyEntry = find.byKey(
-        const ValueKey('mine_privacy_policy_entry'),
-      );
-      await tester.dragUntilVisible(
-        privacyEntry,
-        find.byType(ListView),
-        const Offset(0, -200),
-      );
-      await tester.ensureVisible(privacyEntry);
-      await tester.pumpAndSettle();
-      await tester.tap(privacyEntry);
-      await tester.pumpAndSettle();
+        final entry = find.byKey(const ValueKey('about_latest_release'));
+        await tester.scrollUntilVisible(entry, 200);
+        await tester.tap(entry);
+        await tester.pumpAndSettle();
 
-      expect(receivedCall?.method, 'openExternalUrl');
-      expect(receivedCall?.arguments, const <String, Object>{
-        'url': 'https://anch-docs.pages.dev/privacy/',
-      });
+        expect(calls, hasLength(1));
+        expect(calls.single.method, 'openExternalUrl');
+        expect(calls.single.arguments, const <String, Object>{
+          'url': 'https://github.com/setlater/anch/releases/latest',
+        });
+        expect(tester.takeException(), isNull);
+      }
     });
 
-    testWidgets('6.2 系统无法打开隐私政策时显示可理解反馈', (tester) async {
-      const channel = MethodChannel('anch/external_url');
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (call) async {
-            throw PlatformException(code: 'noBrowserAvailable');
-          });
-      addTearDown(() {
+    for (final throwsError in [false, true]) {
+      testWidgets('最新发布打开失败时显示提示，平台异常：$throwsError', (tester) async {
+        const channel = MethodChannel('anch/external_url');
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(channel, null);
+            .setMockMethodCallHandler(channel, (call) async {
+              if (throwsError) {
+                throw PlatformException(code: 'noBrowserAvailable');
+              }
+              return false;
+            });
+        addTearDown(() {
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+              .setMockMethodCallHandler(channel, null);
+        });
+        await tester.pumpWidget(const MaterialApp(home: AboutPage()));
+        await tester.pumpAndSettle();
+        final entry = find.byKey(const ValueKey('about_latest_release'));
+        await tester.scrollUntilVisible(entry, 200);
+        await tester.tap(entry);
+        await tester.pumpAndSettle();
+
+        expect(find.text('无法打开版本发布页，请稍后重试'), findsOneWidget);
+        expect(tester.takeException(), isNull);
       });
-
-      final runtime = RuntimeProvider.create(
-        const AnchSecurityRuntimeConfig(
-          mode: AnchSecurityMode.dev,
-          useEncryptedDatabase: false,
-          enableSecureWindow: false,
-          enablePrivacyShieldOverlay: false,
-          enableAppLockGate: false,
-          isFormalBlocked: false,
-        ),
-      );
-      await tester.pumpWidget(
-        wrapTest(const MaterialApp(home: MinePage()), runtime),
-      );
-      await tester.pumpAndSettle();
-
-      final privacyEntry = find.byKey(
-        const ValueKey('mine_privacy_policy_entry'),
-      );
-      await tester.dragUntilVisible(
-        privacyEntry,
-        find.byType(ListView),
-        const Offset(0, -300),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(privacyEntry);
-      await tester.pumpAndSettle();
-
-      expect(find.text('无法打开隐私政策网页，请稍后重试'), findsOneWidget);
-    });
+    }
 
     testWidgets('7. 关于页展示当前版本与准确的离线产品边界', (tester) async {
       registerAnchThirdPartyLicenses();

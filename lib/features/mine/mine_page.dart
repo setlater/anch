@@ -12,7 +12,6 @@ import '../../core/runtime/runtime_scope.dart';
 import 'data_management_page.dart';
 import '../app_lock/app_lock_settings_page.dart';
 import '../help/about_page.dart';
-import '../help/external_document_launcher.dart';
 import '../help/help_center_page.dart';
 import '../privacy/screen_protection_settings_page.dart';
 import '../../core/security/screen_protection_settings_manager.dart';
@@ -21,7 +20,7 @@ import '../../core/security/app_lock_dependency_bundle.dart';
 
 /// 我的页。
 ///
-/// 展示本地保存说明、安全设置与数据管理入口。
+/// 展示安全设置、数据管理与帮助入口。
 class MinePage extends StatelessWidget {
   const MinePage({super.key});
 
@@ -108,26 +107,12 @@ class MinePage extends StatelessWidget {
             ),
           ),
           _PlaceholderItem(
-            key: const ValueKey('mine_privacy_policy_entry'),
-            icon: AnchIcons.security,
-            title: '隐私政策',
-            description: '在系统浏览器中查看数据处理说明',
-            onTap: () => AnchExternalDocuments.openPrivacyPolicy(context),
-          ),
-          _PlaceholderItem(
             icon: AnchIcons.info,
             title: '关于安册',
             description: '查看版本与产品边界',
             onTap: () => Navigator.push<void>(
               context,
               MaterialPageRoute(builder: (_) => const AboutPage()),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(AnchSpacing.page),
-            child: Text(
-              '资料仅保存在本机，不联网，无云同步。',
-              style: TextStyle(fontSize: 12, color: colors.textMuted),
             ),
           ),
           const SizedBox(height: AnchSpacing.lg),

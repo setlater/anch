@@ -2,7 +2,7 @@
 
 安册是一款面向中文用户、Android 优先、完全离线的家庭资料册，用于在一台设备上整理自己和家人的身份证件、银行卡、保险、车辆、房产、教育证明和相关附件。
 
-项目源码已开源，首个 Android 安装包已完成约定范围的工程安全准入，尚待发行确认。准入范围和安装包状态以 [ROADMAP.md](ROADMAP.md) 为准。
+项目源码已开源，首个 Android 正式版 [v1.0.0](https://github.com/setlater/anch/releases/tag/v1.0.0) 已发布。约定范围的工程安全准入不等于独立安全审计，准入范围和安装包状态以 [ROADMAP.md](ROADMAP.md) 为准。
 
 核心价值依次是快速找到资料、安全查看与复制、可靠备份恢复、重要日期状态。到期状态只在应用内展示，当前不发送系统通知。
 
@@ -25,6 +25,10 @@ GitHub 仓库为 [setlater/anch](https://github.com/setlater/anch) ，普通问�
 | <img src="docs/showcase/home.png" alt="虚构家庭资料首页" width="240"> | <img src="docs/showcase/members.png" alt="虚构家庭成员与资料数量" width="240"> | <img src="docs/showcase/bank-masked.png" alt="默认遮蔽卡号的虚构银行卡详情" width="240"> |
 
 搜索、备份画面及素材来源见 [运行截图](docs/showcase/README.md) 。验证范围与剩余事项见 [ROADMAP.md](ROADMAP.md) 。
+
+## 下载与安装
+
+从 [GitHub Releases](https://github.com/setlater/anch/releases/latest) 下载正式 APK。当前版本支持 ARM64、Android 8.0／API 26 及以上；同页的 `SHA256SUMS.txt` 用于核对下载文件，`Source code` 压缩包供开发者查看源码。
 
 ## 使用方式
 
@@ -50,9 +54,9 @@ GitHub 仓库为 [setlater/anch](https://github.com/setlater/anch) ，普通问�
 
 真实进度、阻塞和验证结果以 [ROADMAP.md](ROADMAP.md) 为准。
 
-发布前复核发现的屏幕保护异常处理缺口已修复：平台尚未确认保护时隐藏敏感内容，失败时阻断并允许重试，启动失败时不读取本机资料。自动化及新正式候选的受影响真机路径复核已通过，完整准入状态见路线图；当前仍不作面向真实敏感资料的正式发行。
+发布前复核发现的屏幕保护异常处理缺口已修复：平台尚未确认保护时隐藏敏感内容，失败时阻断并允许重试，启动失败时不读取本机资料。自动化及受影响真机路径复核已通过，具体准入与验证边界见路线图。
 
-首发候选安装包要求 ARM64、Android 8.0／API 26 及以上。当前真机验证范围如下，安装条件不代表全设备兼容承诺：
+首发安装包要求 ARM64、Android 8.0／API 26 及以上。当前真机验证范围如下，安装条件不代表全设备兼容承诺：
 
 | 设备与系统 | 实际验证范围 |
 | --- | --- |

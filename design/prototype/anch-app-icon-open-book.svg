@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <title>安册 · 展册可查</title>
+  <desc>浅灰底与石墨蓝灰圆角线条，以展开的双页表达查阅资料。</desc>
+  <rect width="512" height="512" fill="#F7F8FA"/>
+  <g stroke="#2F3B4A" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 166C214 138 168 132 124 144V360C170 348 216 354 256 382C296 354 342 348 388 360V144C344 132 298 138 256 166Z"/>
+    <path d="M256 166V382"/>
+  </g>
+</svg>

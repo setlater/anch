@@ -36,6 +36,7 @@
 - `lib/widgets/`：跨页面共用的资料卡片与导航；`card_contract/` 只保留展示模型、显式接收摘要与时间的无状态构建逻辑和搜索高亮，不维护全局资料缓存。通用、与资料类型无关的布局与交互组件保留在 `lib/core/widgets/`。
 - `lib/app/`：应用依赖装配。
 - `android/`：Android 平台实现。
+- `assets/branding/`：已选定的原创应用品牌 SVG 源文件；Android 自适应、单色与各密度回退图标必须沿用同一造型和比例，不单独手改 PNG。页面功能图标继续使用既有 Solar 资源。
 - `assets/licenses/`：实际取用版本的第三方许可原文、版权与来源说明，供应用许可页和源码公开使用；保留上游原文及元数据差异，不用项目 MIT 许可证替代第三方条款。
 - `android/app/src/main/res/`：Android 图标、启动主题与平台资源；版本限定资源目录只用于对应系统能力，不按设备厂商分支。
 - `android/app/src/main/res/xml/`：Android 系统备份与数据迁移排除规则；敏感资料、密钥和本机设置不得进入系统备份或设备迁移。
@@ -129,3 +130,5 @@ fvm flutter test
 贡献者可显式设置 Gradle 属性 `anchContributor=true`，使用独立应用标识 `icu.codealive.anch.contributor` 与本机默认开发签名，仅支持 Debug／Profile，不配置内部基准模块，也不得生成 Release。该入口不属于内部验收发行物；即使选择加密运行模式，也不替代固定签名的内部验证包。默认未启用该属性时保持原签名要求，不允许因配置缺失自动切换贡献者入口。
 
 发布前还需执行 Release 构建、最终 Manifest 权限审计和 Android 真机安全走查。
+
+经用户明确确认的隔离验收，可通过 `build/` 内外置 Gradle 初始化脚本仅为 Release 验收构建追加独立应用标识与显示名，保留正常生产入口、正式加密默认值和既有 Release 签名要求；不更改正常平台配置、密钥或签名选择逻辑，不加入测试 IPC 或额外权限。该产物仅在独立沙箱中使用虚构资料，不作为正式发行 APK，验收结果须注明包身份差异；原安装及其资料不得清除或覆盖。

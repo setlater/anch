@@ -184,7 +184,7 @@ class BackupFileRestoreApplyCoordinator {
         case BackupImportErrorType.databaseWriteFailed:
           throw BackupFileRestoreApplyException(
             BackupFileRestoreApplyErrorType.importTransactionFailed,
-            '恢复过程中发生错误，当前数据不应被破坏。',
+            '恢复未完成，请返回首页核对资料后再试。',
           );
         default:
           throw BackupFileRestoreApplyException(

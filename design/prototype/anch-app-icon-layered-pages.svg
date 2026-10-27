@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <title>安册 · 叠页归整</title>
+  <desc>浅灰底与石墨蓝灰圆角线条，两张错落的资料页表达收集与整理。</desc>
+  <rect width="512" height="512" fill="#F7F8FA"/>
+  <g stroke="#2F3B4A" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="176" y="118" width="190" height="244" rx="24" transform="rotate(8 271 240)" fill="#F7F8FA"/>
+    <g transform="rotate(-8 239 282)">
+      <rect x="144" y="160" width="190" height="244" rx="24" fill="#F7F8FA"/>
+      <path d="M190 226H288M190 272H264"/>
+    </g>
+  </g>
+</svg>

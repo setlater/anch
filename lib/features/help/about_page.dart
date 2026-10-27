@@ -44,6 +44,20 @@ class AboutPage extends StatelessWidget {
           ),
           const SizedBox(height: AnchSpacing.xxl),
           Text(
+            '作者：setlater',
+            style: TextStyle(color: colors.textSecondary, fontSize: 13),
+          ),
+          const SizedBox(height: AnchSpacing.sm),
+          Text(
+            '安册采用 MIT 许可证开源，第三方材料遵循各自许可。',
+            style: TextStyle(
+              color: colors.textSecondary,
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: AnchSpacing.lg),
+          Text(
             '用于在当前设备上按成员整理和查找重要资料。资料管理无需账号或网络，不会自动上传或同步。',
             style: TextStyle(
               color: colors.textPrimary,

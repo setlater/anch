@@ -128,6 +128,6 @@ Future<void> openEntryFields(
     await tester.tap(find.text(owner));
     await tester.pumpAndSettle();
   }
-  await tester.tap(find.text('下一步：确认资料内容'));
+  await tester.tap(find.text('下一步：填写资料'));
   await tester.pumpAndSettle();
 }

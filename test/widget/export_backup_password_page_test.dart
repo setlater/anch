@@ -434,10 +434,10 @@ void main() {
         find.byKey(const ValueKey('export_backup_loading_barrier')),
         findsNothing,
       );
-      expect(find.textContaining('若系统已创建文件，它不含最终提交帧，不能用于恢复'), findsOneWidget);
+      expect(find.textContaining('如保存位置留下文件，请勿将其作为备份使用'), findsOneWidget);
 
       // 验证错误原因进行了脱敏映射（不含原始 Exception 信息及底层敏感词）
-      expect(find.textContaining('错误原因: 系统未授予写入权限，导出未完成。'), findsOneWidget);
+      expect(find.textContaining('错误原因：系统未授予写入权限，导出未完成。'), findsOneWidget);
       expect(find.textContaining('存储介质不可达'), findsNothing);
 
       // ⚠️ 【安全边界】确保不包含高敏词汇及敏感内容
@@ -483,7 +483,7 @@ void main() {
       await tester.tap(find.text('继续导出'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('错误原因: 部分附件不可用，未生成备份。'), findsOneWidget);
+      expect(find.textContaining('错误原因：部分附件不可用，未生成备份。'), findsOneWidget);
       expect(find.textContaining('底层附件来源不一致'), findsNothing);
     });
 
@@ -534,7 +534,7 @@ void main() {
         findsNothing,
       );
       expect(find.text('导出未完成'), findsOneWidget);
-      expect(find.textContaining('错误原因: 存储空间不足，未生成有效备份。'), findsOneWidget);
+      expect(find.textContaining('错误原因：存储空间不足，未生成有效备份。'), findsOneWidget);
       expect(find.textContaining('virtual output failure'), findsNothing);
     });
 
@@ -581,7 +581,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.textContaining('错误原因: 所选保存位置无法开始写入。请重新选择手机本地文件夹后重试。'),
+        find.textContaining('错误原因：所选保存位置无法开始写入。请重新选择手机本地文件夹后重试。'),
         findsOneWidget,
       );
       expect(find.textContaining('virtual output failure'), findsNothing);
@@ -660,7 +660,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.textContaining('错误原因: 上一次文件操作尚未结束。请返回数据与备份页后再试。'),
+        find.textContaining('错误原因：上一次文件操作尚未结束。请返回数据与备份页后再试。'),
         findsOneWidget,
       );
       expect(find.textContaining('virtual output failure'), findsNothing);
@@ -693,7 +693,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.textContaining('错误原因: 系统保存写入被中断，未生成有效备份。请重新选择保存位置后重试。'),
+        find.textContaining('错误原因：系统保存写入被中断，未生成有效备份。请重新选择保存位置后重试。'),
         findsOneWidget,
       );
       expect(find.textContaining('virtual output failure'), findsNothing);
@@ -852,7 +852,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('资料：TEST-CARD-TITLE'), findsNothing);
-      expect(find.textContaining('原因：'), findsNothing);
+      expect(find.textContaining(RegExp(r'^原因：')), findsNothing);
       expect(find.textContaining('底层附件来源不一致'), findsNothing);
 
       for (final width in [600.0, 900.0]) {
@@ -975,7 +975,7 @@ void main() {
 
       // 断言失败 Dialog 出现
       expect(find.text('导出未完成'), findsOneWidget);
-      expect(find.textContaining('错误原因: 导出已取消，未写入备份文件。'), findsOneWidget);
+      expect(find.textContaining('错误原因：导出已取消，未写入备份文件。'), findsOneWidget);
 
       // 点击“我知道了”
       await tester.tap(find.text('我知道了'));

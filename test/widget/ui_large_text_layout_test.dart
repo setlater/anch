@@ -131,7 +131,7 @@ void main() {
           preparedFileSizeLabel: '合成文件',
         ),
         title: '恢复备份',
-        action: '确定恢复',
+        action: '验证并查看范围',
       ),
     ]) {
       for (final appearance in [

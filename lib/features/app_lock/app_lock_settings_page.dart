@@ -303,11 +303,11 @@ class _AppLockSettingsPageState extends State<AppLockSettingsPage> {
                       if (_enabled) ...[
                         const Divider(),
                         SwitchListTile(
-                          title: const Text('生物认证'),
+                          title: const Text('生物识别解锁'),
                           subtitle: Text(
                             _biometricAvailability ==
                                     AppBiometricAvailability.available
-                                ? '仅使用生物识别，始终保留安册 PIN'
+                                ? '使用指纹等生物识别解锁，仍可使用安册 PIN'
                                 : '本机未配置可用的强生物识别',
                           ),
                           value: _preferences.biometricEnabled,

@@ -412,7 +412,7 @@ void main() {
 
       expect(find.text('暂无资料'), findsOneWidget);
       expect(find.textContaining('开发验证模式'), findsOneWidget);
-      expect(find.textContaining('通过搜索或添加资料开始使用'), findsOneWidget);
+      expect(find.textContaining('添加第一份资料，开始整理'), findsOneWidget);
       expect(find.textContaining('放心录入'), findsNothing);
       expect(
         find.descendant(

@@ -474,7 +474,7 @@ class _SearchPageState extends State<SearchPage> with WidgetsBindingObserver {
       final filteredOut = _matchedItems.isNotEmpty;
       // 搜索无结果空状态
       emptyState = AnchEmptyState(
-        title: sensitiveQuery ? '不支持完整敏感号码搜索' : '暂无资料',
+        title: sensitiveQuery ? '不支持完整敏感号码搜索' : '未找到匹配资料',
         description: sensitiveQuery
             ? '请使用资料名称、类型或银行卡尾号查找。'
             : filteredOut

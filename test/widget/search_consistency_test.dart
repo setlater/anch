@@ -161,7 +161,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilterChip, '已置顶'));
     await tester.pumpAndSettle();
     expect(find.text('TEST record 119', findRichText: true), findsOneWidget);
-    expect(find.text('暂无资料'), findsNothing);
+    expect(find.text('未找到匹配资料'), findsNothing);
   });
 
   for (final width in [320.0, 600.0, 900.0]) {

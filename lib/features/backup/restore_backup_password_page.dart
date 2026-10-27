@@ -550,7 +550,7 @@ class _RestoreBackupPasswordPageState extends State<RestoreBackupPasswordPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '错误原因: $errorMessage',
+                '错误原因：$errorMessage',
                 style: TextStyle(
                   fontSize: 13,
                   color: context.anchColors.danger,
@@ -1120,7 +1120,7 @@ class _RestoreBackupPasswordPageState extends State<RestoreBackupPasswordPage>
           errorMessage = '备份内容校验失败，未执行恢复。';
           break;
         case BackupFileRestoreApplyErrorType.importTransactionFailed:
-          errorMessage = '恢复过程中发生错误，当前数据不应被破坏。';
+          errorMessage = '恢复未完成，请返回首页核对资料后再试。';
           break;
         default:
           errorMessage = '恢复失败，请稍后重试。';
@@ -1583,7 +1583,7 @@ class _RestoreBackupPasswordPageState extends State<RestoreBackupPasswordPage>
                                                           : '正在验证备份密码...')
                                                     : '正在验证备份文件...'))
                                         : (widget.directRestore
-                                              ? '确定恢复'
+                                              ? '验证并查看范围'
                                               : '继续恢复'),
                                     style: const TextStyle(
                                       fontSize: 14,

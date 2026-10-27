@@ -120,7 +120,7 @@ void main() {
       contract4,
       expectedHasHighlight: false,
       expectedHasEmptyState: true,
-      expectedEmptyStateType: '暂无资料',
+      expectedEmptyStateType: '未找到匹配资料',
     );
 
     // 7. 防错断言：搜索 "家庭" (命中 memberName) 或 "储蓄卡" (类型名)

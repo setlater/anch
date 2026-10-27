@@ -14,7 +14,7 @@
 
 ## 数据库
 
-`securityValidation` 与 `formal` 使用 SQLiteMC 文件数据库，密钥由本机安全存储管理。开发和测试的默认 `dev` 模式仍使用内存数据库；Release 无论是否传入安全模式参数，都强制进入 `formal`，不允许通过参数关闭加密或后台防窥。正式模式已可运行，但正式签名 Release 的真机安全走查尚未完成，安全准入状态以 `ROADMAP.md` 为准。
+`securityValidation` 与 `formal` 使用 SQLiteMC 文件数据库，密钥由本机安全存储管理。开发和测试的默认 `dev` 模式仍使用内存数据库；Release 无论是否传入安全模式参数，都强制进入 `formal`，不允许通过参数关闭加密或后台防窥。正式签名 Release 的真机安全走查、准入与发行状态以 [路线图](../ROADMAP.md) 为准。
 
 正式路径要求：
 

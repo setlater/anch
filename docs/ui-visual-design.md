@@ -99,7 +99,9 @@
 
 ## 图标、返回与动效
 
-- 图标固定使用本地 Solar 1.2.5，经 `AnchIcons` 与 `AnchIcon` 统一映射和渲染；不在页面直接拼路径或混入其他库。
+- 页面功能图标固定使用本地 Solar 1.2.5，经 `AnchIcons` 与 `AnchIcon` 统一映射和渲染；不在页面直接拼路径或混入其他库。
+- 应用品牌采用已选定的「合页成册」，源文件为 `assets/branding/anch-app-icon.svg`；浅灰底 `#F7F8FA`、石墨蓝灰轮廓 `#2F3B4A`，512 × 512 源图使用 11px 圆角描边，与归匣应用图标的线条比例一致，保留封面、书脊和露出的内页。源图保持方形画布，圆形／圆角交给系统裁切，不加渐变、阴影或多色装饰。
+- Android 彩色前景与单色前景使用同一几何，单色前景只保留轮廓透明度，不填满背景或封面内部。108dp 图层按 0.140625 倍缩放、18dp 平移居中映射源图轮廓，使中心 72dp 可见区域完整保留 512 × 512 源图留白，主体高度约占 57％，并位于中央 66dp 安全区域内；回退 PNG 按完整 SVG 画布导出 48／72／96／144／192px，不裁切画布放大主体，与自适应图标保持相同占比。启动背景与品牌浅灰一致，并配深色系统栏图标，避免沿用旧青绿配色。规范依据见 [Android 自适应图标](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive) 和 [启动画面](https://developer.android.com/develop/ui/views/launch/splash-screen) 。
 - 类型图标默认中性色；操作和导航选中使用石墨强调色。图形的视觉重量需与相邻文字匹配，不在渲染器暗中缩放个别资源。
 - 来源与许可见 `design/prototype/assets/solar/1.2.5/NOTICE.md`。
 - 返回继续复用 `AnchRouteBack`；编辑、关闭等工具栏操作复用 `AnchHeaderAction`。新增可用同一语义图标的文字按钮。触控区不得遮挡标题，长标题和大字体下操作换行。

@@ -6,7 +6,6 @@ import '../../core/theme/anch_radius.dart';
 import '../../core/theme/anch_spacing.dart';
 import '../../core/widgets/anch_app_scaffold.dart';
 import '../../core/widgets/anch_page_header.dart';
-import 'external_document_launcher.dart';
 
 /// 帮助与安全说明离线页面。
 /// 全静态的离线信息卡片展示，解答不联网、本地保存、备份恢复等安全边界。
@@ -29,8 +28,8 @@ class HelpCenterPage extends StatelessWidget {
             title: '1. 快速开始',
             children: [
               Text(
-                '• 在“成员”中建立本人或家人。\n'
-                '• 在“添加”中选择资料类型并保存。\n'
+                '• 在「成员」中添加家人。\n'
+                '• 点击首页「新增」，选择资料类型并保存。\n'
                 '• 通过首页、分类或搜索快速找到资料。\n'
                 '• 敏感字段默认隐藏，需要时再查看或复制。',
                 style: _bodyStyle,
@@ -105,79 +104,8 @@ class HelpCenterPage extends StatelessWidget {
               ),
             ],
           ),
-          _OnlineHelpCard(
-            onTap: () => AnchExternalDocuments.openLatestHelp(context),
-          ),
           const SizedBox(height: AnchSpacing.xxl),
         ],
-      ),
-    );
-  }
-}
-
-class _OnlineHelpCard extends StatelessWidget {
-  const _OnlineHelpCard({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.anchColors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AnchSpacing.page,
-        vertical: AnchSpacing.sm,
-      ),
-      child: Material(
-        color: colors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AnchRadius.lg),
-          side: BorderSide(color: colors.divider),
-        ),
-        child: InkWell(
-          key: const ValueKey('help_online_latest'),
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AnchRadius.lg),
-          child: Padding(
-            padding: const EdgeInsets.all(AnchSpacing.lg),
-            child: Row(
-              children: [
-                AnchIcon(AnchIcons.help, size: 22, color: colors.accentDeep),
-                const SizedBox(width: AnchSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '查看最新帮助',
-                        style: TextStyle(
-                          color: colors.textPrimary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: AnchSpacing.xs),
-                      Text(
-                        '将在系统浏览器中打开 ${AnchExternalDocuments.host}；安册不会上传本机资料',
-                        style: TextStyle(
-                          color: colors.textSecondary,
-                          fontSize: 12,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: AnchSpacing.sm),
-                AnchIcon(
-                  AnchIcons.chevronRight,
-                  size: 18,
-                  color: colors.textMuted,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

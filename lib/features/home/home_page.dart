@@ -435,7 +435,7 @@ class _SearchEntry extends StatelessWidget {
               const SizedBox(width: AnchSpacing.sm),
               Expanded(
                 child: Text(
-                  '搜索资料、成员或备注',
+                  '搜索名称、成员或类型',
                   style: TextStyle(
                     fontSize: 14,
                     color: context.anchColors.textMuted,
@@ -493,7 +493,7 @@ class _RecentSection extends StatelessWidget {
     if (list.isEmpty) {
       return AnchEmptyState(
         title: '暂无资料',
-        description: '通过搜索或添加资料开始使用',
+        description: '添加第一份资料，开始整理',
         actionLabel: '去添加资料',
         onAction: onAddFirst,
       );

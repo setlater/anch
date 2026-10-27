@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="LaunchTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowSplashScreenBackground">@color/anch_brand_teal</item>
+        <item name="android:windowSplashScreenBackground">@color/anch_brand_background</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/anch_app_icon_foreground</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">@color/anch_brand_teal</item>
-        <item name="android:statusBarColor">@color/anch_brand_teal</item>
-        <item name="android:navigationBarColor">@color/anch_brand_teal</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/anch_brand_background</item>
+        <item name="android:statusBarColor">@color/anch_brand_background</item>
+        <item name="android:navigationBarColor">@color/anch_brand_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 </resources>

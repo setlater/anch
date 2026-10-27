@@ -484,7 +484,7 @@ class _ExportBackupPasswordPageState extends State<ExportBackupPasswordPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '导出流程未完成。若系统已创建文件，它不含最终提交帧，不能用于恢复；应用不会自动删除该文件。',
+                    '导出未完成，请重新导出。如保存位置留下文件，请勿将其作为备份使用。安册不会自动删除该文件。',
                     style: TextStyle(
                       fontSize: 13,
                       color: context.anchColors.textSecondary,
@@ -493,7 +493,7 @@ class _ExportBackupPasswordPageState extends State<ExportBackupPasswordPage>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    '错误原因: $errorMessage',
+                    '错误原因：$errorMessage',
                     style: TextStyle(
                       fontSize: 13,
                       color: context.anchColors.danger,

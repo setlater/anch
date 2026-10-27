@@ -62,8 +62,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('生物认证'), findsOneWidget);
-    expect(find.text('仅使用生物识别，始终保留安册 PIN'), findsOneWidget);
+    expect(find.text('生物识别解锁'), findsOneWidget);
+    expect(find.text('使用指纹等生物识别解锁，仍可使用安册 PIN'), findsOneWidget);
     expect(find.text('自动锁定方式'), findsOneWidget);
     expect(find.text('每次回到安册时'), findsOneWidget);
     expect(find.text('修改安册 PIN'), findsOneWidget);

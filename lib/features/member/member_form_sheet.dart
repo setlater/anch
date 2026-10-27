@@ -243,7 +243,7 @@ class _MemberFormSheetState extends State<MemberFormSheet> {
                   maxLength: 20,
                   decoration: const InputDecoration(
                     labelText: '称呼',
-                    hintText: '如：爸爸、大宝、我的车',
+                    hintText: '如：爸爸、妈妈、大宝',
                     counterText: '',
                   ),
                   textInputAction: TextInputAction.next,

@@ -92,7 +92,7 @@ void main() {
       ContractTestRunner.verify(
         contract,
         expectedHasEmptyState: true,
-        expectedEmptyStateType: '暂无资料',
+        expectedEmptyStateType: '未找到匹配资料',
       );
 
       // 点击“去添加资料”，校验跳转到 ItemEntryFlowPage

@@ -2107,7 +2107,7 @@ class _ItemEntryFlowPageState extends State<ItemEntryFlowPage>
         if (!_isKeyboardVisible)
           AnchBottomActionBar(
             key: KeyRegistry.flowButtonNext,
-            primaryLabel: '下一步：确认资料内容',
+            primaryLabel: '下一步：填写资料',
             compactWhenKeyboardVisible: true,
             compactPrimaryLabel: '下一步',
             isKeyboardVisible: _isKeyboardVisible,

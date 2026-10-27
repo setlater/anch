@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>安册 · 品牌图标方向</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #2f3b4a; background: #fff; --radius: 0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px 24px 48px; }
+    main { max-width: 1080px; margin: auto; }
+    h1 { margin: 0 0 12px; font-size: 28px; }
+    p { margin: 8px 0; line-height: 1.7; }
+    .intro { max-width: 760px; color: #5c6068; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
+    button { min-height: 44px; border: 1px solid #dce1e6; border-radius: 8px; padding: 8px 16px; background: #fff; color: inherit; font: inherit; cursor: pointer; }
+    button[aria-pressed="true"] { color: #fff; background: #2f3b4a; border-color: #2f3b4a; }
+    button:focus-visible, a:focus-visible { outline: 3px solid #8c9cb1; outline-offset: 3px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; }
+    article { min-width: 0; border: 1px solid #e2e5e9; border-radius: 14px; padding: 24px; }
+    .hero { display: block; width: min(100%, 224px); aspect-ratio: 1; margin: 0 auto 24px; border-radius: var(--radius); }
+    h2 { margin: 0 0 8px; font-size: 19px; }
+    .tag { display: inline-block; margin: 0 0 12px; color: #5c6068; font-size: 13px; }
+    article p { min-height: 76px; font-size: 14px; }
+    .sizes { display: flex; flex-wrap: wrap; align-items: end; gap: 20px; margin-top: 22px; }
+    figure { margin: 0; text-align: center; }
+    figure img { display: block; border-radius: var(--radius); }
+    figcaption { margin-top: 8px; color: #5c6068; font-size: 12px; }
+    .spec { margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e5e9; color: #5c6068; font-size: 14px; }
+    a { color: #2f3b4a; text-underline-offset: 3px; }
+    @media (max-width: 420px) { body { padding: 24px 16px; } article { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>安册 · 品牌图标方向</h1>
+    <p class="intro">沿用归匣、织境、藏真的浅灰与石墨蓝灰、圆角几何线条。已选定Ａ「合页成册」，其余两款保留作设计对照；正式接入源文件位于 assets/branding/anch-app-icon.svg。</p>
+    <div class="controls" role="group" aria-label="预览裁切形状">
+      <button type="button" data-radius="0" aria-pressed="true">方形源图</button>
+      <button type="button" data-radius="24%" aria-pressed="false">圆角预览</button>
+      <button type="button" data-radius="50%" aria-pressed="false">圆形预览</button>
+    </div>
+    <section class="grid" aria-label="三个图标方案">
+      <article>
+        <img class="hero" src="anch-app-icon-bound-book.svg" alt="合页成册：带书脊与露出内页的闭合资料册">
+        <h2>Ａ · 合页成册</h2>
+        <span class="tag">已选方案</span>
+        <p>封面、书脊与露出的内页构成一个安静的资料册。强调「整理成册」，适合长期保管重要资料的产品定位。</p>
+        <div class="sizes">
+          <figure><img src="anch-app-icon-bound-book.svg" width="32" height="32" alt="合页成册，32 像素"><figcaption>32px</figcaption></figure>
+          <figure><img src="anch-app-icon-bound-book.svg" width="48" height="48" alt="合页成册，48 像素"><figcaption>48px</figcaption></figure>
+          <figure><img src="anch-app-icon-bound-book.svg" width="64" height="64" alt="合页成册，64 像素"><figcaption>64px</figcaption></figure>
+        </div>
+      </article>
+      <article>
+        <img class="hero" src="anch-app-icon-layered-pages.svg" alt="叠页归整：两张交叠、略微倾斜的资料页">
+        <h2>Ｂ · 叠页归整</h2>
+        <span class="tag">偏向资料整理</span>
+        <p>错落的资料页表达收集和归整，轮廓更活泼；与归匣的卡片语言接近，资料册的识别相对弱一些。</p>
+        <div class="sizes">
+          <figure><img src="anch-app-icon-layered-pages.svg" width="32" height="32" alt="叠页归整，32 像素"><figcaption>32px</figcaption></figure>
+          <figure><img src="anch-app-icon-layered-pages.svg" width="48" height="48" alt="叠页归整，48 像素"><figcaption>48px</figcaption></figure>
+          <figure><img src="anch-app-icon-layered-pages.svg" width="64" height="64" alt="叠页归整，64 像素"><figcaption>64px</figcaption></figure>
+        </div>
+      </article>
+      <article>
+        <img class="hero" src="anch-app-icon-open-book.svg" alt="展册可查：从中线展开的双页资料册">
+        <h2>Ｃ · 展册可查</h2>
+        <span class="tag">偏向资料查阅</span>
+        <p>用展开的双页表现随时查阅，左右结构清楚；读书工具的联想更强，辨识度主要来自简洁的整体轮廓。</p>
+        <div class="sizes">
+          <figure><img src="anch-app-icon-open-book.svg" width="32" height="32" alt="展册可查，32 像素"><figcaption>32px</figcaption></figure>
+          <figure><img src="anch-app-icon-open-book.svg" width="48" height="48" alt="展册可查，48 像素"><figcaption>48px</figcaption></figure>
+          <figure><img src="anch-app-icon-open-book.svg" width="64" height="64" alt="展册可查，64 像素"><figcaption>64px</figcaption></figure>
+        </div>
+      </article>
+    </section>
+    <div class="spec">
+      <p>背景 <code>#F7F8FA</code>，线条 <code>#2F3B4A</code>，512 × 512 源图中Ａ方案使用 11px 圆角描边，与归匣应用图标一致；Ｂ、Ｃ保留原始 14px 对照稿。圆角和圆形只模拟裁切，未烘焙进源图。</p>
+      <p>Ａ方案接入 Android 自适应图标、单色图标与各密度回退 PNG，平台留白按安全区域调整；实际完成状态与验证范围见项目 ROADMAP.md。</p>
+      <p>原图：<a href="anch-app-icon-bound-book.svg">合页成册 SVG</a> · <a href="anch-app-icon-layered-pages.svg">叠页归整 SVG</a> · <a href="anch-app-icon-open-book.svg">展册可查 SVG</a></p>
+    </div>
+  </main>
+  <script>
+    document.querySelectorAll('[data-radius]').forEach(button => {
+      button.addEventListener('click', () => {
+        document.documentElement.style.setProperty('--radius', button.dataset.radius);
+        document.querySelectorAll('[data-radius]').forEach(item => {
+          item.setAttribute('aria-pressed', String(item === button));
+        });
+      });
+    });
+  </script>
+</body>
+</html>

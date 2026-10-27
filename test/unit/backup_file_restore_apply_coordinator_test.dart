@@ -352,7 +352,7 @@ void main() {
         fail('Should have failed');
       } on BackupFileRestoreApplyException catch (e) {
         expect(e.type, BackupFileRestoreApplyErrorType.importTransactionFailed);
-        expect(e.message, '恢复过程中发生错误，当前数据不应被破坏。');
+        expect(e.message, '恢复未完成，请返回首页核对资料后再试。');
       }
 
       // 验证事务完整回滚，旧数据未被清除

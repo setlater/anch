@@ -297,47 +297,6 @@ void main() {
       }
     });
 
-    testWidgets('6. 最新帮助明确说明外部浏览器与隐私边界，并仅传递固定 HTTPS 地址', (
-      WidgetTester tester,
-    ) async {
-      const channel = MethodChannel('anch/external_url');
-      MethodCall? receivedCall;
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (call) async {
-            receivedCall = call;
-            return true;
-          });
-      addTearDown(() {
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(channel, null);
-      });
-
-      await tester.pumpWidget(const MaterialApp(home: HelpCenterPage()));
-      await tester.pumpAndSettle();
-
-      final latestHelp = find.byKey(const ValueKey('help_online_latest'));
-      await tester.dragUntilVisible(
-        latestHelp,
-        find.byType(ListView),
-        const Offset(0, -300),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('查看最新帮助'), findsOneWidget);
-      expect(
-        find.text('将在系统浏览器中打开 anch-docs.pages.dev；安册不会上传本机资料'),
-        findsOneWidget,
-      );
-
-      await tester.tap(latestHelp);
-      await tester.pumpAndSettle();
-
-      expect(receivedCall?.method, 'openExternalUrl');
-      expect(receivedCall?.arguments, const <String, Object>{
-        'url': 'https://anch-docs.pages.dev/',
-      });
-    });
-
     testWidgets('6.1 隐私政策通过系统浏览器打开固定 HTTPS 地址', (WidgetTester tester) async {
       const channel = MethodChannel('anch/external_url');
       MethodCall? receivedCall;
@@ -385,7 +344,7 @@ void main() {
       });
     });
 
-    testWidgets('6.2 系统无法打开网页时显示可理解反馈', (tester) async {
+    testWidgets('6.2 系统无法打开隐私政策时显示可理解反馈', (tester) async {
       const channel = MethodChannel('anch/external_url');
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (call) async {
@@ -396,20 +355,34 @@ void main() {
             .setMockMethodCallHandler(channel, null);
       });
 
-      await tester.pumpWidget(const MaterialApp(home: HelpCenterPage()));
+      final runtime = RuntimeProvider.create(
+        const AnchSecurityRuntimeConfig(
+          mode: AnchSecurityMode.dev,
+          useEncryptedDatabase: false,
+          enableSecureWindow: false,
+          enablePrivacyShieldOverlay: false,
+          enableAppLockGate: false,
+          isFormalBlocked: false,
+        ),
+      );
+      await tester.pumpWidget(
+        wrapTest(const MaterialApp(home: MinePage()), runtime),
+      );
       await tester.pumpAndSettle();
 
-      final latestHelp = find.byKey(const ValueKey('help_online_latest'));
+      final privacyEntry = find.byKey(
+        const ValueKey('mine_privacy_policy_entry'),
+      );
       await tester.dragUntilVisible(
-        latestHelp,
+        privacyEntry,
         find.byType(ListView),
         const Offset(0, -300),
       );
       await tester.pumpAndSettle();
-      await tester.tap(latestHelp);
+      await tester.tap(privacyEntry);
       await tester.pumpAndSettle();
 
-      expect(find.text('无法打开帮助网页，请稍后重试'), findsOneWidget);
+      expect(find.text('无法打开隐私政策网页，请稍后重试'), findsOneWidget);
     });
 
     testWidgets('7. 关于页展示当前版本与准确的离线产品边界', (tester) async {
@@ -421,6 +394,8 @@ void main() {
       expect(find.text('关于安册'), findsOneWidget);
       expect(find.text('版本 1.0.0（1）'), findsOneWidget);
       expect(find.text('重要资料，整理成册'), findsOneWidget);
+      expect(find.text('作者：setlater'), findsOneWidget);
+      expect(find.text('安册采用 MIT 许可证开源，第三方材料遵循各自许可。'), findsOneWidget);
       expect(
         find.text('用于在当前设备上按成员整理和查找重要资料。资料管理无需账号或网络，不会自动上传或同步。'),
         findsOneWidget,
@@ -430,6 +405,10 @@ void main() {
       expect(find.text('第三方许可'), findsOneWidget);
       expect(find.text('查看组件与图标的版权和许可'), findsOneWidget);
 
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('about_open_source_licenses')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(const ValueKey('about_open_source_licenses')),
       );

@@ -335,7 +335,7 @@ void main() {
 
       // 验证弹出失败 Dialog
       expect(find.text('备份文件读取失败'), findsOneWidget);
-      expect(find.textContaining('错误原因: 备份文件过大，暂不支持读取。'), findsOneWidget);
+      expect(find.textContaining('错误原因：备份文件过大，暂不支持读取。'), findsOneWidget);
 
       // 关闭弹窗
       await tester.tap(find.text('我知道了'));
@@ -617,7 +617,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextFormField), 'wrong-password-1');
-      await tester.tap(find.text('确定恢复'));
+      await tester.tap(find.text('验证并查看范围'));
       await tester.pumpAndSettle();
 
       expect(find.text('无法恢复备份'), findsOneWidget);
@@ -635,7 +635,7 @@ void main() {
       );
 
       await tester.enterText(find.byType(TextFormField), 'wrong-password-2');
-      await tester.tap(find.text('确定恢复'));
+      await tester.tap(find.text('验证并查看范围'));
       await tester.pumpAndSettle();
 
       expect(decryptCalls, 2);
@@ -665,7 +665,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextFormField), 'restore-password');
-      await tester.tap(find.text('确定恢复'));
+      await tester.tap(find.text('验证并查看范围'));
       await tester.pumpAndSettle();
 
       expect(clearCalls, 1);
@@ -1008,7 +1008,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextFormField), 'TEST-restore-123');
-      await tester.tap(find.text('确定恢复'));
+      await tester.tap(find.text('验证并查看范围'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('确认后会完整校验备份并准备附件'), findsOneWidget);
@@ -1113,7 +1113,7 @@ void main() {
 
       // 验证弹出失败 Dialog 并校验脱敏
       expect(find.text('恢复失败'), findsOneWidget);
-      expect(find.textContaining('恢复过程中发生错误，当前数据不应被破坏。'), findsOneWidget);
+      expect(find.textContaining('恢复未完成，请返回首页核对资料后再试。'), findsOneWidget);
 
       final dialogFinder = find.byType(AlertDialog);
       expect(
@@ -1184,7 +1184,7 @@ void main() {
       expect(find.text('继续恢复'), findsNothing);
 
       await tester.enterText(find.byType(TextFormField), 'TEST-direct-restore');
-      await tester.tap(find.text('确定恢复'));
+      await tester.tap(find.text('验证并查看范围'));
       await tester.pumpAndSettle();
 
       expect(decryptCalls, 1);
@@ -1229,7 +1229,7 @@ void main() {
 
       expect(find.text('尚未选择备份文件'), findsOneWidget);
       expect(find.byType(TextFormField), findsNothing);
-      expect(find.text('确定恢复'), findsNothing);
+      expect(find.text('验证并查看范围'), findsNothing);
 
       await tester.tap(find.text('选择文件'));
       await tester.pumpAndSettle();
@@ -1238,7 +1238,7 @@ void main() {
       expect(find.text('已选择备份文件 · 2 KB'), findsOneWidget);
       expect(find.text('重新选择'), findsOneWidget);
       expect(find.byType(TextFormField), findsOneWidget);
-      expect(find.text('确定恢复'), findsOneWidget);
+      expect(find.text('验证并查看范围'), findsOneWidget);
     });
 
     testWidgets('系统文件选择器往返不清除新选文件或弹出安全保护提示', (WidgetTester tester) async {
@@ -1358,7 +1358,7 @@ void main() {
         find.byType(TextFormField),
         List<String>.filled(8, 'x').join(),
       );
-      await tester.tap(find.text('确定恢复'));
+      await tester.tap(find.text('验证并查看范围'));
       await tester.pumpAndSettle();
       expect(decryptCalls, 1);
       expect(find.text('备份密码验证通过'), findsOneWidget);

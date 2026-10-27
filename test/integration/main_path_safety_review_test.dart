@@ -292,7 +292,7 @@ void main() {
         const Duration(milliseconds: 600),
       ); // 等待 debounce 完成
       expect(find.text('王五的身份证'), findsNothing);
-      expect(find.text('暂无资料'), findsOneWidget);
+      expect(find.text('未找到匹配资料'), findsOneWidget);
 
       // D2. 输入标题搜索，卡片展示，但卡片中不展示备注明文
       await tester.enterText(searchInput, '王五');

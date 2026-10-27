@@ -344,7 +344,7 @@ void main() {
 
       // 验证返回到了搜索页，并且由于删除联动刷新，结果展示为了空状态
       expect(find.text('张三的身份证'), findsNothing);
-      expect(find.text('暂无资料'), findsOneWidget);
+      expect(find.text('未找到匹配资料'), findsOneWidget);
     });
 
     testWidgets('5. 键盘弹出时搜索无结果空状态可滚动且不溢出', (WidgetTester tester) async {
@@ -369,7 +369,7 @@ void main() {
       ); // 等待 debounce 完成
 
       // 校验无结果空状态文案
-      expect(find.text('暂无资料'), findsOneWidget);
+      expect(find.text('未找到匹配资料'), findsOneWidget);
       expect(find.textContaining('开发验证模式'), findsOneWidget);
       expect(find.text('去添加资料'), findsOneWidget);
       expect(

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <title>安册 · 合页成册</title>
+  <desc>浅灰底与石墨蓝灰圆角线条，以书脊、封面和露出的内页表达整理成册。</desc>
+  <rect width="512" height="512" fill="#F7F8FA"/>
+  <g stroke="#2F3B4A" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M194 116H342Q376 116 376 150V344"/>
+    <rect x="136" y="148" width="212" height="248" rx="26" fill="#F7F8FA"/>
+    <path d="M194 148V396"/>
+  </g>
+</svg>

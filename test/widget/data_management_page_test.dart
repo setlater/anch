@@ -391,7 +391,7 @@ void main() {
 
       // 断言失败 Dialog 出现且包含“导出已取消，未写入备份文件”
       expect(find.text('导出未完成'), findsOneWidget);
-      expect(find.textContaining('错误原因: 导出已取消，未写入备份文件。'), findsOneWidget);
+      expect(find.textContaining('错误原因：导出已取消，未写入备份文件。'), findsOneWidget);
 
       // 点击“我知道了”关闭 Dialog
       await tester.tap(find.text('我知道了'));

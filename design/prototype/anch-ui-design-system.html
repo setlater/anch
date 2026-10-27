@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>安册 UI 设计系统 v1.0</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --canvas: #f6f8f7;
+      --surface: #ffffff;
+      --surface-subtle: #edf2f0;
+      --text-primary: #1b2423;
+      --text-secondary: #4b5b58;
+      --text-tertiary: #687471;
+      --primary: #4f7773;
+      --on-primary: #ffffff;
+      --primary-container: #ddeae7;
+      --on-primary-container: #244844;
+      --border: #d7dfdd;
+      --border-strong: #bcc8c5;
+      --success: #2f7656;
+      --success-container: #dff0e7;
+      --on-success-container: #245b43;
+      --warning: #8a6518;
+      --warning-container: #f7ebc8;
+      --on-warning-container: #6b4d0d;
+      --danger: #a34848;
+      --on-danger: #ffffff;
+      --danger-container: #f6e2e2;
+      --on-danger-container: #7e3434;
+      --disabled-bg: #e5e9e8;
+      --disabled-fg: #8b9693;
+      --scrim: rgba(16, 23, 22, .60);
+      --workbench: #e8ecea;
+      --shadow-dialog: 0 4px 16px rgba(0, 0, 0, .14);
+      --preview-width: 390px;
+      --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px;
+      --s6: 24px; --s8: 32px; --s10: 40px; --s12: 48px; --s16: 64px;
+      --r-status: 6px; --r-menu: 8px; --r-control: 10px; --r-card: 12px; --r-dialog: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --canvas: #111817;
+      --surface: #18211f;
+      --surface-subtle: #202b29;
+      --text-primary: #e8efed;
+      --text-secondary: #b8c5c1;
+      --text-tertiary: #8e9d99;
+      --primary: #85aaa5;
+      --on-primary: #10211f;
+      --primary-container: #2b4a46;
+      --on-primary-container: #ddeae7;
+      --border: #34413f;
+      --border-strong: #4a5a57;
+      --success: #79c59e;
+      --success-container: #1d3a2d;
+      --on-success-container: #a7dbbe;
+      --warning: #d9b75b;
+      --warning-container: #403517;
+      --on-warning-container: #f0d47e;
+      --danger: #e09999;
+      --on-danger: #301416;
+      --danger-container: #472424;
+      --on-danger-container: #f0b1b1;
+      --disabled-bg: #293230;
+      --disabled-fg: #65716e;
+      --scrim: rgba(0, 0, 0, .70);
+      --workbench: #0b100f;
+      --shadow-dialog: none;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; min-width: 320px; color: var(--text-primary); background: var(--workbench); }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    .solar-icon { display: inline-grid; place-items: center; width: 1em; height: 1em; flex: 0 0 auto; }
+    .solar-icon svg { display: block; width: 1em; height: 1em; }
+
+    .site-header { position: sticky; top: 0; z-index: 30; border-bottom: 1px solid var(--border); background: var(--surface); }
+    .header-inner { width: min(1480px, 100%); min-height: 72px; margin: auto; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; color: var(--on-primary); background: var(--primary); font-size: 22px; }
+    .brand h1 { margin: 0; font-size: 18px; line-height: 1.35; font-weight: 650; }
+    .brand p { margin: 2px 0 0; color: var(--text-tertiary); font-size: 11px; }
+    .controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .segmented { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .segmented button { min-height: 40px; padding: 0 12px; border: 0; border-radius: 8px; color: var(--text-secondary); background: transparent; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .segmented button.active { color: var(--on-primary-container); background: var(--primary-container); }
+
+    .layout { width: min(1480px, 100%); margin: auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); }
+    .toc { position: sticky; top: 73px; align-self: start; height: calc(100vh - 73px); padding: 24px 16px 32px 24px; border-right: 1px solid var(--border); overflow: auto; }
+    .toc strong { display: block; margin: 0 10px 10px; color: var(--text-tertiary); font-size: 10px; letter-spacing: .12em; }
+    .toc a { min-height: 40px; padding: 0 10px; display: flex; align-items: center; gap: 9px; border-radius: 8px; color: var(--text-secondary); text-decoration: none; font-size: 13px; }
+    .toc a:hover { color: var(--primary); background: var(--primary-container); }
+    .toc .solar-icon { font-size: 18px; }
+
+    main { min-width: 0; padding: 40px 32px 80px; }
+    .hero { max-width: 900px; padding: 22px 0 28px; }
+    .eyebrow { color: var(--primary); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+    .hero h2 { margin: 10px 0 12px; font-size: clamp(32px, 5vw, 54px); line-height: 1.08; letter-spacing: -.045em; font-weight: 650; }
+    .hero p { max-width: 720px; margin: 0; color: var(--text-secondary); font-size: 15px; line-height: 1.8; }
+    .principles { margin-top: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--border); border-radius: 16px; background: var(--border); }
+    .principle { min-height: 130px; padding: 18px; background: var(--surface); }
+    .principle b { display: block; margin-bottom: 8px; font-size: 14px; }
+    .principle span { color: var(--text-secondary); font-size: 12px; line-height: 1.65; }
+
+    .doc-section { scroll-margin-top: 92px; margin-top: 64px; }
+    .section-head { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: end; gap: 20px; }
+    .section-head h2 { margin: 0 0 6px; font-size: 24px; font-weight: 650; }
+    .section-head p { max-width: 720px; margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.65; }
+    .version { padding: 4px 8px; border-radius: 6px; color: var(--on-primary-container); background: var(--primary-container); font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .panel { padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--canvas); }
+    .panel + .panel { margin-top: 16px; }
+    .panel-title { margin: 0 0 14px; font-size: 15px; font-weight: 650; }
+    .note { color: var(--text-secondary); font-size: 12px; line-height: 1.65; }
+    code { padding: 2px 5px; border-radius: 4px; color: var(--text-secondary); background: var(--surface-subtle); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .swatch { overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .swatch-color { height: 64px; background: var(--color); }
+    .swatch-info { padding: 10px 11px; }
+    .swatch-info b, .swatch-info span { display: block; }
+    .swatch-info b { font-size: 11px; }
+    .swatch-info span { margin-top: 3px; color: var(--text-tertiary); font: 9px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .foundation-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; }
+    .type-list { border-top: 1px solid var(--border); }
+    .type-row { min-height: 64px; padding: 8px 0; display: grid; grid-template-columns: 150px 1fr auto; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); }
+    .type-row small { color: var(--text-tertiary); font-size: 10px; }
+    .type-row .sample { line-height: 1.5; }
+    .type-page { font-size: 24px; font-weight: 600; line-height: 32px; }
+    .type-section { font-size: 18px; font-weight: 600; line-height: 26px; }
+    .type-body { font-size: 16px; line-height: 24px; }
+    .type-secondary { font-size: 14px; line-height: 20px; }
+    .type-caption { font-size: 12px; line-height: 18px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .metric { min-height: 86px; padding: 13px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+    .metric b { display: block; font-size: 13px; }
+    .metric span { display: block; margin-top: 5px; color: var(--text-secondary); font-size: 11px; line-height: 1.5; }
+    .radius-demo { width: 42px; height: 26px; margin-bottom: 8px; border: 1px solid var(--primary); border-radius: var(--radius); background: var(--primary-container); }
+    .line-demo { width: 64px; margin: 9px 0 12px; border-top: var(--line) solid var(--primary); }
+    .space-scale { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; }
+    .space-item { min-width: 48px; text-align: center; }
+    .space-bar { width: var(--space); height: var(--space); margin: auto auto 8px; background: var(--primary); opacity: .8; }
+    .space-item b, .space-item small { display: block; }
+    .space-item b { font-size: 10px; }.space-item small { color: var(--text-tertiary); font-size: 9px; }
+
+    .icon-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .icon-card { min-height: 128px; padding: 13px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); text-align: center; }
+    .icon-card .solar-icon { color: var(--primary); font-size: 32px; }
+    .icon-card b { margin-top: 10px; font-size: 12px; }
+    .icon-card small { margin-top: 4px; color: var(--text-tertiary); font: 8px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-word; }
+    .icon-rules { margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+    .component-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .component-card { min-width: 0; padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+    .component-card h3 { margin: 0 0 4px; font-size: 14px; }
+    .component-card > p { margin: 0 0 16px; color: var(--text-tertiary); font-size: 10px; }
+    .demo-stack { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .btn { min-height: 48px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; border: 1px solid transparent; cursor: default; font-size: 15px; font-weight: 600; }
+    .btn .solar-icon { font-size: 20px; }
+    .btn-primary { color: var(--on-primary); background: var(--primary); }
+    .btn-secondary { border-color: var(--border-strong); background: var(--surface); }
+    .btn-text { padding: 0 12px; color: var(--primary); background: transparent; }
+    .btn-danger { color: var(--on-danger); background: var(--danger); }
+    .btn-disabled { color: var(--disabled-fg); background: var(--disabled-bg); }
+    .field { margin-top: 10px; }
+    .field label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; font-weight: 500; }
+    .input { min-height: 52px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--border-strong); border-radius: 10px; color: var(--text-primary); background: var(--surface); font-size: 16px; }
+    .input.focus { border: 2px solid var(--primary); }
+    .input.error { border: 2px solid var(--danger); }
+    .input .solar-icon { color: var(--text-secondary); font-size: 22px; }
+    .helper { margin: 4px 2px 0; color: var(--text-tertiary); font-size: 12px; }
+    .helper.error { color: var(--danger); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { min-height: 24px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+    .tag .solar-icon { font-size: 14px; }
+    .tag-neutral { color: var(--text-secondary); background: var(--surface-subtle); }
+    .tag-success { color: var(--on-success-container); background: var(--success-container); }
+    .tag-warning { color: var(--on-warning-container); background: var(--warning-container); }
+    .tag-danger { color: var(--on-danger-container); background: var(--danger-container); }
+    .record-list { border-top: 1px solid var(--border); }
+    .record { min-height: 72px; display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .record > .solar-icon { color: var(--primary); font-size: 26px; }
+    .record b { display: block; font-size: 16px; }.record small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: 13px; }
+    .setting-row { min-height: 64px; display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+    .setting-row > .solar-icon { color: var(--text-secondary); font-size: 23px; }
+    .setting-row b { display: block; font-size: 15px; }.setting-row small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: 12px; }
+    .switch { width: 44px; height: 26px; padding: 3px; border-radius: 13px; background: var(--primary); }
+    .switch::after { content: ""; display: block; width: 20px; height: 20px; margin-left: 18px; border-radius: 50%; background: var(--on-primary); }
+    .dialog-demo { padding: 24px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-dialog); }
+    .dialog-demo h4 { margin: 0 0 10px; font-size: 18px; }.dialog-demo p { margin: 0; color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+    .dialog-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 8px; }
+
+    .page-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .page-tab { min-height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); background: var(--surface); cursor: pointer; font-size: 12px; font-weight: 600; }
+    .page-tab.active { color: var(--on-primary-container); border-color: var(--primary); background: var(--primary-container); }
+    .preview-stage { min-height: 720px; padding: 28px; display: flex; justify-content: center; overflow: auto; border: 1px solid var(--border); border-radius: 16px; background: var(--workbench); }
+    .screen { container-type: inline-size; width: min(100%, var(--preview-width)); min-height: 680px; overflow: hidden; border: 1px solid var(--border); border-radius: 20px; background: var(--canvas); box-shadow: 0 10px 36px rgba(20, 31, 29, .10); transition: width .2s ease; }
+    body.dark .screen { box-shadow: none; }
+    .page-panel { display: none; min-height: 680px; }
+    .page-panel.active { display: block; }
+    .appbar { min-height: 56px; padding: 0 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid transparent; }
+    .appbar h3 { flex: 1; margin: 0; font-size: 20px; font-weight: 600; }
+    .icon-button { width: 48px; height: 48px; display: grid; place-items: center; border: 0; border-radius: 10px; color: var(--text-primary); background: transparent; font-size: 24px; }
+    .page-content { width: min(100%, 840px); margin: auto; padding: 16px 16px 28px; }
+    .page-content.form-width { max-width: 640px; }
+    .welcome { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin: 8px 0 20px; }
+    .welcome h4 { margin: 0 0 4px; font-size: 24px; line-height: 32px; }.welcome p { margin: 0; color: var(--text-secondary); font-size: 14px; }
+    .search { min-height: 52px; padding: 0 14px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-strong); border-radius: 10px; color: var(--text-tertiary); background: var(--surface); font-size: 14px; }
+    .search .solar-icon { font-size: 22px; }
+    .section-label { margin: 24px 0 8px; font-size: 18px; font-weight: 600; }
+    .data-list { padding: 0 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .fab { width: 52px; height: 52px; margin: 22px 0 0 auto; display: grid; place-items: center; border: 0; border-radius: 12px; color: var(--on-primary); background: var(--primary); font-size: 24px; }
+    .pin-page { min-height: 680px; padding: 56px 24px 30px; display: flex; flex-direction: column; align-items: center; }
+    .pin-lock { color: var(--primary); font-size: 34px; }.pin-page h3 { margin: 22px 0 7px; font-size: 24px; }.pin-page > p { margin: 0; color: var(--text-secondary); font-size: 14px; }
+    .pin-dots { margin: 38px 0 28px; display: flex; gap: 16px; }.pin-dot { width: 14px; height: 14px; border: 2px solid var(--border-strong); border-radius: 50%; }.pin-dot.on { border-color: var(--primary); background: var(--primary); }
+    .pin-error { min-height: 20px; color: var(--danger); font-size: 13px; }
+    .keypad { width: min(100%, 320px); margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .key { min-height: 64px; display: grid; place-items: center; border-radius: 10px; font-size: 22px; font-weight: 500; }.key.muted { color: var(--text-secondary); font-size: 22px; }
+    .form-section { margin-bottom: 24px; }.form-section h4 { margin: 0 0 12px; font-size: 18px; }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .choice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .choice-card { min-height: 72px; padding: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .choice-card.selected { border: 2px solid var(--primary); background: var(--primary-container); }.choice-card .solar-icon { color: var(--primary); font-size: 28px; }.choice-card b { font-size: 14px; }
+    .bottom-action { padding: 12px 16px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: var(--surface); }.bottom-action .btn { width: 100%; }
+    .identity { padding: 18px; display: flex; align-items: center; gap: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }.identity .solar-icon { color: var(--primary); font-size: 38px; }.identity h4 { margin: 0 0 5px; font-size: 18px; }.identity p { margin: 0; color: var(--text-secondary); font-size: 13px; }
+    .detail-group { margin-top: 24px; }.detail-group h4 { margin: 0 0 8px; font-size: 18px; }.detail-row { min-height: 68px; padding: 10px 0; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }.detail-row small { display: block; color: var(--text-secondary); font-size: 13px; }.detail-row b { display: block; margin-top: 4px; font-size: 16px; font-weight: 500; }.detail-row .icon-button { color: var(--primary); }
+    .settings-group { margin-bottom: 28px; }.settings-group h4 { margin: 0 0 6px; color: var(--text-secondary); font-size: 13px; }.settings-list { padding: 0 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .risk-box { margin: 18px 0; padding: 14px; display: flex; align-items: flex-start; gap: 10px; border-radius: 10px; color: var(--on-danger-container); background: var(--danger-container); font-size: 13px; line-height: 1.6; }.risk-box .solar-icon { margin-top: 1px; font-size: 22px; }
+    .backup-options { display: grid; grid-template-columns: 1fr; gap: 12px; }.backup-card { padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }.backup-card > .solar-icon { color: var(--primary); font-size: 30px; }.backup-card h4 { margin: 14px 0 6px; font-size: 17px; }.backup-card p { margin: 0 0 16px; color: var(--text-secondary); font-size: 13px; line-height: 1.6; }.backup-card .btn { width: 100%; }
+    .reset-copy h4 { margin: 10px 0 8px; font-size: 20px; }.reset-copy p, .reset-copy li { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }.reset-copy ul { padding-left: 20px; }
+
+    @container (min-width: 600px) {
+      .page-content { padding: 24px; }
+      .form-grid { grid-template-columns: repeat(2, 1fr); }
+      .choice-grid { grid-template-columns: repeat(4, 1fr); }
+      .backup-options { grid-template-columns: repeat(2, 1fr); }
+      .pin-page { padding-top: 72px; }
+    }
+    @container (min-width: 900px) {
+      .page-content { padding: 32px 24px; }
+      .backup-options { grid-template-columns: repeat(2, minmax(0, 380px)); justify-content: center; }
+    }
+
+    .anti-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .anti { min-height: 88px; padding: 14px; border-left: 2px solid var(--danger); background: var(--surface); }
+    .anti b { display: block; font-size: 12px; }.anti span { display: block; margin-top: 6px; color: var(--text-secondary); font-size: 11px; line-height: 1.55; }
+    .footer-note { margin-top: 48px; padding: 18px 20px; border-left: 3px solid var(--primary); color: var(--text-secondary); background: var(--surface); font-size: 12px; line-height: 1.7; }
+    body.focus-pages .hero, body.focus-pages #foundation, body.focus-pages #icons, body.focus-pages #components { display: none; }
+    body.focus-pages #pages { margin-top: 24px; }
+
+    @media (max-width: 1100px) {
+      .principles { grid-template-columns: repeat(2, 1fr); }
+      .swatches { grid-template-columns: repeat(3, 1fr); }
+      .icon-grid { grid-template-columns: repeat(4, 1fr); }
+      .metrics, .icon-rules { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 760px) {
+      .site-header { position: static; }
+      .header-inner { align-items: flex-start; flex-direction: column; padding: 14px; }
+      .controls { justify-content: flex-start; }
+      .layout { display: block; }
+      .toc { display: none; }
+      main { padding: 24px 13px 56px; }
+      .hero { padding-top: 12px; }.hero h2 { font-size: 34px; }
+      .principles, .foundation-grid, .component-grid, .anti-grid { grid-template-columns: 1fr; }
+      .swatches { grid-template-columns: repeat(2, 1fr); }
+      .icon-grid { grid-template-columns: repeat(2, 1fr); }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .type-row { grid-template-columns: 1fr; gap: 3px; padding: 12px 0; }
+      .preview-stage { padding: 10px; }
+      .screen { border-radius: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand"><div class="brand-mark"><span data-solar="notebook-bold-duotone"></span></div><div><h1>安册 UI 设计系统</h1><p>雾青砂 · Solar · v1.0 视觉基线</p></div></div>
+      <div class="controls">
+        <div class="segmented" aria-label="预览宽度"><button class="active" data-width="390">紧凑</button><button data-width="720">常规</button><button data-width="1040">扩展</button></div>
+        <div class="segmented" aria-label="主题"><button class="active" data-mode="light">亮色</button><button data-mode="dark">暗色</button></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc"><strong>设计系统</strong><a href="#principles"><span data-solar="heart-linear"></span>原则</a><a href="#foundation"><span data-solar="wheel-angle-linear"></span>基础 Token</a><a href="#icons"><span data-solar="documents-minimalistic-linear"></span>图标</a><a href="#components"><span data-solar="archive-linear"></span>组件</a><a href="#pages"><span data-solar="home-2-linear"></span>页面样张</a><a href="#anti"><span data-solar="danger-circle-linear"></span>反模式</a></aside>
+    <main>
+      <section class="hero" id="principles">
+        <div class="eyebrow">ANCH／ANDROID FIRST／OFFLINE</div>
+        <h2>安静、清楚、可信的家庭资料册</h2>
+        <p>用中性表面承载高密度资料，用雾青砂表达主要操作与选中状态。安全感来自信息秩序、明确反馈和可预测行为，不来自深色背景、盾牌装饰或警报式文案。</p>
+        <div class="principles">
+          <div class="principle"><b>中性承载</b><span>页面和资料表面保持接近中性，品牌色不进入普通卡片矩阵。</span></div>
+          <div class="principle"><b>语义分离</b><span>雾青、成功绿、警告琥珀和危险红各司其职，不相互复用。</span></div>
+          <div class="principle"><b>平面优先</b><span>使用留白、标题和细分隔线建立层级，减少嵌套卡片和装饰底块。</span></div>
+          <div class="principle"><b>触控不减重</b><span>所有可点击区域至少 48 × 48dp，视觉收紧不缩小实际触控范围。</span></div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="foundation">
+        <div class="section-head"><div><h2>基础 Token</h2><p>固定语义角色，不允许页面直接选择临时 HEX；亮暗主题只切换同一角色的既定值。</p></div><span class="version">Fog Teal</span></div>
+        <div class="panel"><h3 class="panel-title">颜色</h3><div class="swatches">
+          <div class="swatch"><div class="swatch-color" style="--color:var(--canvas)"></div><div class="swatch-info"><b>canvas</b><span>#F6F8F7／#111817</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--surface)"></div><div class="swatch-info"><b>surface</b><span>#FFFFFF／#18211F</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--surface-subtle)"></div><div class="swatch-info"><b>surfaceSubtle</b><span>#EDF2F0／#202B29</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--text-primary)"></div><div class="swatch-info"><b>textPrimary</b><span>#1B2423／#E8EFED</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--text-secondary)"></div><div class="swatch-info"><b>textSecondary</b><span>#4B5B58／#B8C5C1</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--primary)"></div><div class="swatch-info"><b>primary</b><span>#4F7773／#85AAA5</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--primary-container)"></div><div class="swatch-info"><b>primaryContainer</b><span>#DDEAE7／#2B4A46</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--success)"></div><div class="swatch-info"><b>success</b><span>#2F7656／#79C59E</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--warning)"></div><div class="swatch-info"><b>warning</b><span>#8A6518／#D9B75B</span></div></div>
+          <div class="swatch"><div class="swatch-color" style="--color:var(--danger)"></div><div class="swatch-info"><b>danger</b><span>#A34848／#E09999</span></div></div>
+        </div><p class="note">弱文字直接使用 <code>textTertiary</code>，不再叠加透明度。媒体黑底、透明色和遮罩是明确例外，不作为普通组件颜色来源。</p></div>
+        <div class="foundation-grid">
+          <div class="panel"><h3 class="panel-title">文字层级</h3><div class="type-list">
+            <div class="type-row"><code>pageTitle</code><span class="sample type-page">资料与证件</span><small>24／600／32</small></div>
+            <div class="type-row"><code>sectionTitle</code><span class="sample type-section">即将到期</span><small>18／600／26</small></div>
+            <div class="type-row"><code>body</code><span class="sample type-body">虚构资料内容用于排版验证</span><small>16／400／24</small></div>
+            <div class="type-row"><code>secondary</code><span class="sample type-secondary">有效期至 2032 年 8 月</span><small>14／400／20</small></div>
+            <div class="type-row"><code>caption</code><span class="sample type-caption">仅保存在本机</span><small>12／400／18</small></div>
+          </div></div>
+          <div class="panel"><h3 class="panel-title">圆角与线宽</h3><div class="metrics">
+            <div class="metric"><div class="radius-demo" style="--radius:6px"></div><b>6dp</b><span>状态标签</span></div><div class="metric"><div class="radius-demo" style="--radius:10px"></div><b>10dp</b><span>按钮／输入</span></div><div class="metric"><div class="radius-demo" style="--radius:12px"></div><b>12dp</b><span>卡片／选择</span></div><div class="metric"><div class="radius-demo" style="--radius:16px"></div><b>16dp</b><span>对话框／Sheet</span></div>
+            <div class="metric"><div class="line-demo" style="--line:1px"></div><b>1dp</b><span>普通边框</span></div><div class="metric"><div class="line-demo" style="--line:2px"></div><b>2dp</b><span>焦点／错误／选中</span></div><div class="metric"><b>48dp</b><span>最小触控目标与默认按钮高度</span></div><div class="metric"><b>无阴影</b><span>普通卡片依靠表面和边框</span></div>
+          </div></div>
+        </div>
+        <div class="panel"><h3 class="panel-title">4dp 间距系统</h3><div class="space-scale">
+          <div class="space-item"><div class="space-bar" style="--space:4px"></div><b>space.1</b><small>4</small></div><div class="space-item"><div class="space-bar" style="--space:8px"></div><b>space.2</b><small>8</small></div><div class="space-item"><div class="space-bar" style="--space:12px"></div><b>space.3</b><small>12</small></div><div class="space-item"><div class="space-bar" style="--space:16px"></div><b>space.4</b><small>16</small></div><div class="space-item"><div class="space-bar" style="--space:20px"></div><b>space.5</b><small>20</small></div><div class="space-item"><div class="space-bar" style="--space:24px"></div><b>space.6</b><small>24</small></div><div class="space-item"><div class="space-bar" style="--space:32px"></div><b>space.8</b><small>32</small></div><div class="space-item"><div class="space-bar" style="--space:40px"></div><b>space.10</b><small>40</small></div><div class="space-item"><div class="space-bar" style="--space:48px"></div><b>space.12</b><small>48</small></div><div class="space-item"><div class="space-bar" style="--space:64px"></div><b>space.16</b><small>64</small></div>
+        </div><p class="note">手机页面边距 16dp，≥600dp 使用 24dp；表单最大宽度 640dp，资料列表最大宽度 840dp。</p></div>
+      </section>
+
+      <section class="doc-section" id="icons">
+        <div class="section-head"><div><h2>Solar 图标系统</h2><p>资料类型使用 Bold Duotone，功能操作使用 Linear，导航选中使用同一图形的 Bold。统一使用语义色，不增加彩色圆形底块。</p></div><span class="version">Solar 1.2.5</span></div>
+        <div class="panel"><div class="icon-grid">
+          <div class="icon-card"><span data-solar="user-id-bold-duotone"></span><b>身份证</b><small>user-id</small></div><div class="icon-card"><span data-solar="notebook-bold-duotone"></span><b>户口本</b><small>notebook</small></div><div class="icon-card"><span data-solar="passport-bold-duotone"></span><b>护照</b><small>passport</small></div><div class="icon-card"><span data-solar="passport-minimalistic-bold-duotone"></span><b>港澳通行证</b><small>passport-minimalistic</small></div><div class="icon-card"><span data-solar="card-2-bold-duotone"></span><b>驾驶证</b><small>card-2</small></div><div class="icon-card"><span data-solar="document-text-bold-duotone"></span><b>行驶证</b><small>document-text</small></div><div class="icon-card"><span data-solar="document-medicine-bold-duotone"></span><b>出生医学证明</b><small>document-medicine</small></div><div class="icon-card"><span data-solar="clipboard-heart-bold-duotone"></span><b>结婚证</b><small>clipboard-heart</small></div><div class="icon-card"><span data-solar="wallet-money-bold-duotone"></span><b>储蓄卡</b><small>wallet-money</small></div><div class="icon-card"><span data-solar="card-bold-duotone"></span><b>信用卡</b><small>card</small></div><div class="icon-card"><span data-solar="shield-user-bold-duotone"></span><b>保险单</b><small>shield-user</small></div><div class="icon-card"><span data-solar="buildings-3-bold-duotone"></span><b>不动产权证</b><small>buildings-3</small></div><div class="icon-card"><span data-solar="diploma-verified-bold-duotone"></span><b>学历／学位</b><small>diploma-verified</small></div><div class="icon-card"><span data-solar="documents-minimalistic-bold-duotone"></span><b>其他资料</b><small>documents-minimalistic</small></div>
+        </div><div class="icon-rules"><div class="metric"><b>16–20dp</b><span>小状态与行内反馈</span></div><div class="metric"><b>24dp</b><span>导航和通用操作</span></div><div class="metric"><b>28–32dp</b><span>资料类型重点图标</span></div><div class="metric"><b>禁止混搭</b><span>不混入 Material、Cupertino 或其他图标库</span></div></div></div>
+      </section>
+
+      <section class="doc-section" id="components">
+        <div class="section-head"><div><h2>基础组件</h2><p>状态不能只依赖颜色；焦点、错误、完成和选中同时使用边框、图标或明确文字。</p></div></div>
+        <div class="component-grid">
+          <div class="component-card"><h3>按钮</h3><p>48dp 高度／10dp 圆角／同屏一个主要实心操作</p><div class="demo-stack"><button class="btn btn-primary"><span data-solar="add-circle-linear"></span>新增资料</button><button class="btn btn-secondary">稍后处理</button><button class="btn btn-text">查看详情</button><button class="btn btn-danger">覆盖本机数据</button><button class="btn btn-disabled">不可用</button></div></div>
+          <div class="component-card"><h3>输入框</h3><p>52dp 高度／默认 1dp／焦点与错误 2dp</p><div class="field"><label>资料名称</label><div class="input">示例护照<span data-solar="pen-linear"></span></div><div class="helper">使用容易辨认的名称</div></div><div class="field"><label>证件号码</label><div class="input focus">E123•••••</div></div><div class="field"><label>确认 PIN</label><div class="input error">••••••</div><div class="helper error">两次输入的 PIN 不一致</div></div></div>
+          <div class="component-card"><h3>状态标签</h3><p>24dp 高度／6dp 圆角／图标或文字必须明确状态</p><div class="tags"><span class="tag tag-neutral">已归档</span><span class="tag tag-success"><span data-solar="check-circle-linear"></span>备份完成</span><span class="tag tag-warning"><span data-solar="clock-circle-linear"></span>即将到期</span><span class="tag tag-danger"><span data-solar="danger-circle-linear"></span>恢复失败</span></div></div>
+          <div class="component-card"><h3>资料列表项</h3><p>平面列表／64–72dp／不为每条资料建立悬浮卡</p><div class="record-list"><div class="record"><span data-solar="passport-bold-duotone"></span><div><b>示例护照</b><small>林安 · 有效期至 2032 年 8 月</small></div><span class="tag tag-neutral">有效</span></div><div class="record"><span data-solar="user-id-bold-duotone"></span><div><b>示例身份证</b><small>林安 · 尾号 2048</small></div><span class="tag tag-warning">30 天</span></div></div></div>
+          <div class="component-card"><h3>设置列表项</h3><p>单行 56dp／双行 64–72dp／图标使用次级文字色</p><div class="setting-row"><span data-solar="lock-linear"></span><div><b>应用锁</b><small>离开应用后自动锁定</small></div><div class="switch"></div></div><div class="setting-row"><span data-solar="key-linear"></span><div><b>修改 PIN</b><small>需要验证当前 PIN</small></div><span>›</span></div></div>
+          <div class="component-card"><h3>危险确认对话框</h3><p>中性表面／单个危险按钮／后果文案具体</p><div class="dialog-demo"><h4>覆盖本机数据？</h4><p>恢复将替换当前资料和附件。开始前会完整验证备份，验证失败时不会修改现有数据。</p><div class="dialog-actions"><button class="btn btn-text" style="color:var(--text-secondary)">取消</button><button class="btn btn-danger">覆盖本机数据</button></div></div></div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="pages">
+        <div class="section-head"><div><h2>典型页面样张</h2><p>使用虚构资料验证完整组合。顶部可切换亮暗主题和紧凑、常规、扩展宽度；布局按可用窗口宽度重排。</p></div><span class="version">Fictional data only</span></div>
+        <div class="page-tabs"><button class="page-tab active" data-page="home">首页</button><button class="page-tab" data-page="pin">应用锁</button><button class="page-tab" data-page="edit">新增／编辑</button><button class="page-tab" data-page="detail">资料详情</button><button class="page-tab" data-page="settings">设置</button><button class="page-tab" data-page="backup">备份恢复</button><button class="page-tab" data-page="reset">数据重置</button></div>
+        <div class="preview-stage"><div class="screen">
+          <article class="page-panel active" data-panel="home"><div class="appbar"><h3>安册</h3><button class="icon-button"><span data-solar="user-rounded-linear"></span></button></div><div class="page-content"><div class="welcome"><div><h4>资料与证件</h4><p>2 份资料需要留意</p></div><span class="tag tag-warning"><span data-solar="clock-circle-linear"></span>即将到期</span></div><div class="search"><span data-solar="magnifer-linear"></span>搜索资料名称、持有人或备注</div><h4 class="section-label">最近查看</h4><div class="data-list"><div class="record"><span data-solar="passport-bold-duotone"></span><div><b>示例护照</b><small>林安 · 有效期至 2032 年 8 月</small></div><span>›</span></div><div class="record"><span data-solar="notebook-bold-duotone"></span><div><b>示例户口本</b><small>家庭资料 · 更新于 6 月 12 日</small></div><span>›</span></div><div class="record"><span data-solar="document-medicine-bold-duotone"></span><div><b>示例出生医学证明</b><small>林小禾 · 已归档</small></div><span>›</span></div></div><button class="fab" aria-label="新增资料"><span data-solar="add-circle-linear"></span></button></div></article>
+          <article class="page-panel" data-panel="pin"><div class="pin-page"><span class="pin-lock" data-solar="lock-bold-duotone"></span><h3>输入 PIN</h3><p>解锁后查看保存在本机的资料</p><div class="pin-dots"><i class="pin-dot on"></i><i class="pin-dot on"></i><i class="pin-dot"></i><i class="pin-dot"></i><i class="pin-dot"></i><i class="pin-dot"></i></div><div class="pin-error">PIN 不正确，请重新输入</div><div class="keypad"><div class="key">1</div><div class="key">2</div><div class="key">3</div><div class="key">4</div><div class="key">5</div><div class="key">6</div><div class="key">7</div><div class="key">8</div><div class="key">9</div><div class="key muted"><span data-solar="user-id-linear"></span></div><div class="key">0</div><div class="key muted">⌫</div></div></div></article>
+          <article class="page-panel" data-panel="edit"><div class="appbar"><button class="icon-button">‹</button><h3>新增资料</h3></div><div class="page-content form-width"><div class="form-section"><h4>选择资料类型</h4><div class="choice-grid"><div class="choice-card selected"><span data-solar="user-id-bold-duotone"></span><b>身份证</b></div><div class="choice-card"><span data-solar="passport-bold-duotone"></span><b>护照</b></div><div class="choice-card"><span data-solar="notebook-bold-duotone"></span><b>户口本</b></div><div class="choice-card"><span data-solar="documents-minimalistic-bold-duotone"></span><b>其他</b></div></div></div><div class="form-section"><h4>基本信息</h4><div class="form-grid"><div class="field"><label>资料名称</label><div class="input focus">示例身份证</div></div><div class="field"><label>持有人</label><div class="input">林安</div></div><div class="field"><label>证件号码</label><div class="input">1101••••2048</div></div><div class="field"><label>有效期</label><div class="input">2036 年 7 月 16 日</div></div></div></div></div><div class="bottom-action"><button class="btn btn-primary">保存资料</button></div></article>
+          <article class="page-panel" data-panel="detail"><div class="appbar"><button class="icon-button">‹</button><h3>资料详情</h3><button class="icon-button"><span data-solar="pen-linear"></span></button></div><div class="page-content form-width"><div class="identity"><span data-solar="passport-bold-duotone"></span><div><h4>示例护照</h4><p>林安 · 有效</p></div></div><div class="detail-group"><h4>证件信息</h4><div class="detail-row"><div><small>护照号码</small><b>E123•••••</b></div><button class="icon-button" aria-label="复制"><span data-solar="copy-linear"></span></button></div><div class="detail-row"><div><small>签发日期</small><b>2022 年 8 月 18 日</b></div></div><div class="detail-row"><div><small>有效期至</small><b>2032 年 8 月 17 日</b></div></div></div><div class="detail-group"><h4>敏感备注</h4><div class="input">••••••••••<span data-solar="eye-linear"></span></div><div class="helper">离开页面后自动隐藏</div></div></div></article>
+          <article class="page-panel" data-panel="settings"><div class="appbar"><button class="icon-button">‹</button><h3>设置</h3></div><div class="page-content form-width"><div class="settings-group"><h4>安全</h4><div class="settings-list"><div class="setting-row"><span data-solar="lock-linear"></span><div><b>应用锁</b><small>离开应用后自动锁定</small></div><div class="switch"></div></div><div class="setting-row"><span data-solar="key-linear"></span><div><b>修改 PIN</b><small>需要验证当前 PIN</small></div><span>›</span></div></div></div><div class="settings-group"><h4>数据</h4><div class="settings-list"><div class="setting-row"><span data-solar="archive-linear"></span><div><b>备份与恢复</b><small>创建或验证加密备份</small></div><span>›</span></div><div class="setting-row"><span data-solar="trash-bin-trash-linear" style="color:var(--danger)"></span><div><b style="color:var(--danger)">重置本机数据</b><small>删除本机资料和附件</small></div><span>›</span></div></div></div></div></article>
+          <article class="page-panel" data-panel="backup"><div class="appbar"><button class="icon-button">‹</button><h3>备份与恢复</h3></div><div class="page-content"><p class="note">备份文件经过加密，只能使用创建时设置的密码恢复。安册不会上传或找回密码。</p><div class="backup-options"><div class="backup-card"><span data-solar="upload-bold-duotone"></span><h4>创建加密备份</h4><p>导出当前资料、附件和设置，保存为一份加密备份文件。</p><button class="btn btn-primary"><span data-solar="upload-linear"></span>创建备份</button></div><div class="backup-card"><span data-solar="download-bold-duotone"></span><h4>从备份恢复</h4><p>先验证文件和密码，再预览将被覆盖的本机数据范围。</p><button class="btn btn-secondary"><span data-solar="download-linear"></span>选择备份文件</button></div></div><div class="tags" style="margin-top:18px"><span class="tag tag-success"><span data-solar="check-circle-linear"></span>上次备份已完成</span></div></div></article>
+          <article class="page-panel" data-panel="reset"><div class="appbar"><button class="icon-button">‹</button><h3>重置本机数据</h3></div><div class="page-content form-width"><div class="reset-copy"><h4>删除保存在此设备上的全部数据</h4><p>此操作不会影响已经导出的备份文件，但本机数据删除后无法撤销。</p><ul><li>全部资料字段和分类</li><li>本机保存的附件</li><li>应用锁和本机设置</li></ul></div><div class="risk-box"><span data-solar="shield-warning-linear"></span><span><b>操作不可撤销</b><br />如果仍需保留资料，请先创建并验证加密备份。</span></div><div class="field"><label>输入「删除全部本机数据」以继续</label><div class="input">删除全部本机数据</div></div><button class="btn btn-danger" style="width:100%;margin-top:24px">删除全部本机数据</button></div></article>
+        </div></div>
+      </section>
+
+      <section class="doc-section" id="anti"><div class="section-head"><div><h2>必须避免的反模式</h2><p>以下做法会破坏安册的秩序感、语义清晰度或安全边界。</p></div></div><div class="anti-grid"><div class="anti"><b>视觉装饰化</b><span>渐变、玻璃模糊、彩色阴影、发光 PIN、漂浮几何和大面积插画。</span></div><div class="anti"><b>过度卡片化</b><span>每条资料、每个字段和每个设置项都使用独立圆角悬浮卡片。</span></div><div class="anti"><b>颜色越权</b><span>默认 Material 蓝绿橙红、动态取色覆盖品牌色、品牌色兼任成功色。</span></div><div class="anti"><b>图标随机混搭</b><span>Solar、Material、Cupertino 和临时自绘图标在同一页面共存。</span></div><div class="anti"><b>仅靠颜色表达</b><span>选中、错误、到期、复制完成或恢复完成没有文字、边框或图标辅助。</span></div><div class="anti"><b>安全营销化</b><span>盾牌装饰、“智能守护”“AI 管家”“银行级视觉”等营销表达。</span></div></div></section>
+
+      <div class="footer-note"><b>工程约束：</b>Flutter 页面只消费语义 token 和统一图标映射；不改变安全状态机、PIN 行为、备份格式、数据库、权限或触控流程。此 HTML 使用本地 Solar 资源和虚构资料，只作为视觉规范与实施对照。</div>
+    </main>
+  </div>
+
+  <script src="assets/solar/1.2.5/icons.js"></script>
+  <script>
+    const solar = window.ANCH_SOLAR_ICONS;
+    document.querySelectorAll('[data-solar]').forEach((node) => {
+      const icon = solar.icons[node.dataset.solar];
+      if (!icon) throw new Error(`Missing Solar icon: ${node.dataset.solar}`);
+      node.classList.add('solar-icon');
+      node.innerHTML = `<svg viewBox="0 0 ${solar.width || 24} ${solar.height || 24}" aria-hidden="true" focusable="false">${icon.body}</svg>`;
+    });
+
+    const modeButtons = document.querySelectorAll('[data-mode]');
+    modeButtons.forEach((button) => button.addEventListener('click', () => {
+      document.body.classList.toggle('dark', button.dataset.mode === 'dark');
+      modeButtons.forEach((item) => item.classList.toggle('active', item === button));
+    }));
+
+    const widthButtons = document.querySelectorAll('[data-width]');
+    widthButtons.forEach((button) => button.addEventListener('click', () => {
+      document.documentElement.style.setProperty('--preview-width', `${button.dataset.width}px`);
+      widthButtons.forEach((item) => item.classList.toggle('active', item === button));
+    }));
+
+    const pageTabs = document.querySelectorAll('[data-page]');
+    pageTabs.forEach((button) => button.addEventListener('click', () => {
+      document.querySelectorAll('[data-panel]').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === button.dataset.page));
+      pageTabs.forEach((item) => item.classList.toggle('active', item === button));
+    }));
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'dark') modeButtons[1].click();
+    if (['390', '720', '1040'].includes(params.get('width'))) document.querySelector(`[data-width="${params.get('width')}"]`).click();
+    if (document.querySelector(`[data-page="${params.get('page')}"]`)) document.querySelector(`[data-page="${params.get('page')}"]`).click();
+    if (params.get('focus') === 'pages') document.body.classList.add('focus-pages');
+  </script>
+</body>
+</html>

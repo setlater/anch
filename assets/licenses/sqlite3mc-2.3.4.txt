@@ -1,0 +1,1305 @@
+SQLite3 Multiple Ciphers 2.3.4
+
+Source: https://github.com/utelle/SQLite3MultipleCiphers/releases/tag/v2.3.4
+SQLite: 3.53.1
+Dart distribution: sqlite3 3.3.2
+Build source: https://github.com/simolus3/sqlite3.dart/blob/sqlite3-3.3.2/tool/download_sqlite.dart
+
+SQLiteMC is licensed under MIT. Original upstream LICENSE follows.
+
+MIT License
+
+Copyright (c) 2019-2024 Ulrich Telle
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+SQLite original public-domain notice:
+
+/*
+** 2001 September 15
+**
+** The author disclaims copyright to this source code.  In place of
+** a legal notice, here is a blessing:
+**
+**    May you do good and not evil.
+**    May you find forgiveness for yourself and forgive others.
+**    May you share freely, never taking more than you give.
+**
+*************************************************************************
+** Internal interface definitions for SQLite.
+**
+*/
+
+Original component copyright and SPDX lines from the published amalgamation:
+
+Copyright (C) 2005, 2007 Olivier Gay <olivier.gay@a3.epfl.ch>
+Copyright (c) 2001 Alexander Peslyak and it is hereby released to the
+Copyright (c) 2015 Thomas Pornin
+Copyright 2010-2014 Rich Geldreich and Tenacious Software LLC
+Copyright 2013-2014 RAD Game Tools and Valve Software
+Copyright 2015
+Copyright 2016 Martin Raiber
+Copyright:   (c) 2006-2020 Ulrich Telle
+Copyright:   (c) 2006-2022 Ulrich Telle
+Copyright:   (c) 2006-2024 Ulrich Telle
+Copyright:   (c) 2006-2025 Ulrich Telle
+Copyright:   (c) 2006-2026 Ulrich Telle
+Copyright:   (c) 2019-2025 Ulrich Telle
+Copyright:   (c) 2019-2026 Ulrich Telle
+Copyright:   (c) 2020 Ulrich Telle
+Copyright:   (c) 2020-2023 Ulrich Telle
+Copyright:   (c) 2020-2026 Ulrich Telle
+Copyright:   (c) 2022 Ulrich Telle
+Copyright:   (c) 2023 Ulrich Telle
+Copyright:   (c) 2023-2023 Ulrich Telle
+Copyright:   (c) 2023-2024 Frank Denis
+Copyright:   (c) 2023-2024 Ulrich Telle
+Copyright:   (c) 2024-2024 Ulrich Telle
+Copyright:   (c) 2024-2026 Ulrich Telle
+SPDX-License-Identifier: MIT
+
+Original additional component notices from the published amalgamation:
+
+/*
+** This function is called by unixOpen() to determine the unix permissions
+** to create new files with. If no error occurs, then SQLITE_OK is returned
+** and a value suitable for passing as the third argument to open(2) is
+** written to *pMode. If an IO error occurs, an SQLite error code is
+** returned and the value of *pMode is not modified.
+**
+** In most cases, this routine sets *pMode to 0, which will become
+** an indication to robust_open() to create the file using
+** SQLITE_DEFAULT_FILE_PERMISSIONS adjusted by the umask.
+** But if the file being opened is a WAL or regular journal file, then
+** this function queries the file-system for the permissions on the
+** corresponding database file and sets *pMode to this value. Whenever
+** possible, WAL and journal files are created using the same permissions
+** as the associated database file.
+**
+** If the SQLITE_ENABLE_8_3_NAMES option is enabled, then the
+** original filename is unavailable.  But 8_3_NAMES is only used for
+** FAT filesystems and permissions do not matter there, so just use
+** the default permissions.  In 8_3_NAMES mode, leave *pMode set to zero.
+*/
+
+/******************************************************************************
+************************** Begin Proxy Locking ********************************
+**
+** Proxy locking is a "uber-locking-method" in this sense:  It uses the
+** other locking methods on secondary lock files.  Proxy locking is a
+** meta-layer over top of the primitive locking implemented above.  For
+** this reason, the division that implements of proxy locking is deferred
+** until late in the file (here) after all of the other I/O methods have
+** been defined - so that the primitive locking methods are available
+** as services to help with the implementation of proxy locking.
+**
+****
+**
+** The default locking schemes in SQLite use byte-range locks on the
+** database file to coordinate safe, concurrent access by multiple readers
+** and writers [http://sqlite.org/lockingv3.html].  The five file locking
+** states (UNLOCKED, PENDING, SHARED, RESERVED, EXCLUSIVE) are implemented
+** as POSIX read & write locks over fixed set of locations (via fsctl),
+** on AFP and SMB only exclusive byte-range locks are available via fsctl
+** with _IOWR('z', 23, struct ByteRangeLockPB2) to track the same 5 states.
+** To simulate a F_RDLCK on the shared range, on AFP a randomly selected
+** address in the shared range is taken for a SHARED lock, the entire
+** shared range is taken for an EXCLUSIVE lock):
+**
+**      PENDING_BYTE        0x40000000
+**      RESERVED_BYTE       0x40000001
+**      SHARED_RANGE        0x40000002 -> 0x40000200
+**
+** This works well on the local file system, but shows a nearly 100x
+** slowdown in read performance on AFP because the AFP client disables
+** the read cache when byte-range locks are present.  Enabling the read
+** cache exposes a cache coherency problem that is present on all OS X
+** supported network file systems.  NFS and AFP both observe the
+** close-to-open semantics for ensuring cache coherency
+** [http://nfs.sourceforge.net/#faq_a8], which does not effectively
+** address the requirements for concurrent database access by multiple
+** readers and writers
+** [http://www.nabble.com/SQLite-on-NFS-cache-coherency-td15655701.html].
+**
+** To address the performance and cache coherency issues, proxy file locking
+** changes the way database access is controlled by limiting access to a
+** single host at a time and moving file locks off of the database file
+** and onto a proxy file on the local file system.
+**
+**
+** Using proxy locks
+** -----------------
+**
+** C APIs
+**
+**  sqlite3_file_control(db, dbname, SQLITE_FCNTL_SET_LOCKPROXYFILE,
+**                       <proxy_path> | ":auto:");
+**  sqlite3_file_control(db, dbname, SQLITE_FCNTL_GET_LOCKPROXYFILE,
+**                       &<proxy_path>);
+**
+**
+** SQL pragmas
+**
+**  PRAGMA [database.]lock_proxy_file=<proxy_path> | :auto:
+**  PRAGMA [database.]lock_proxy_file
+**
+** Specifying ":auto:" means that if there is a conch file with a matching
+** host ID in it, the proxy path in the conch file will be used, otherwise
+** a proxy path based on the user's temp dir
+** (via confstr(_CS_DARWIN_USER_TEMP_DIR,...)) will be used and the
+** actual proxy file name is generated from the name and path of the
+** database file.  For example:
+**
+**       For database path "/Users/me/foo.db"
+**       The lock path will be "<tmpdir>/sqliteplocks/_Users_me_foo.db:auto:")
+**
+** Once a lock proxy is configured for a database connection, it can not
+** be removed, however it may be switched to a different proxy path via
+** the above APIs (assuming the conch file is not being held by another
+** connection or process).
+**
+**
+** How proxy locking works
+** -----------------------
+**
+** Proxy file locking relies primarily on two new supporting files:
+**
+**   *  conch file to limit access to the database file to a single host
+**      at a time
+**
+**   *  proxy file to act as a proxy for the advisory locks normally
+**      taken on the database
+**
+** The conch file - to use a proxy file, sqlite must first "hold the conch"
+** by taking an sqlite-style shared lock on the conch file, reading the
+** contents and comparing the host's unique host ID (see below) and lock
+** proxy path against the values stored in the conch.  The conch file is
+** stored in the same directory as the database file and the file name
+** is patterned after the database file name as ".<databasename>-conch".
+** If the conch file does not exist, or its contents do not match the
+** host ID and/or proxy path, then the lock is escalated to an exclusive
+** lock and the conch file contents is updated with the host ID and proxy
+** path and the lock is downgraded to a shared lock again.  If the conch
+** is held by another process (with a shared lock), the exclusive lock
+** will fail and SQLITE_BUSY is returned.
+**
+** The proxy file - a single-byte file used for all advisory file locks
+** normally taken on the database file.   This allows for safe sharing
+** of the database file for multiple readers and writers on the same
+** host (the conch ensures that they all use the same local lock file).
+**
+** Requesting the lock proxy does not immediately take the conch, it is
+** only taken when the first request to lock database file is made.
+** This matches the semantics of the traditional locking behavior, where
+** opening a connection to a database file does not take a lock on it.
+** The shared lock and an open file descriptor are maintained until
+** the connection to the database is closed.
+**
+** The proxy file and the lock file are never deleted so they only need
+** to be created the first time they are used.
+**
+** Configuration options
+** ---------------------
+**
+**  SQLITE_PREFER_PROXY_LOCKING
+**
+**       Database files accessed on non-local file systems are
+**       automatically configured for proxy locking, lock files are
+**       named automatically using the same logic as
+**       PRAGMA lock_proxy_file=":auto:"
+**
+**  SQLITE_PROXY_DEBUG
+**
+**       Enables the logging of error messages during host id file
+**       retrieval and creation
+**
+**  LOCKPROXYDIR
+**
+**       Overrides the default directory used for lock proxy files that
+**       are named automatically via the ":auto:" setting
+**
+**  SQLITE_DEFAULT_PROXYDIR_PERMISSIONS
+**
+**       Permissions to use when creating a directory for storing the
+**       lock proxy files, only used when LOCKPROXYDIR is not set.
+**
+**
+** As mentioned above, when compiled with SQLITE_PREFER_PROXY_LOCKING,
+** setting the environment variable SQLITE_FORCE_PROXY_LOCKING to 1 will
+** force proxy locking to be used for every database file opened, and 0
+** will force automatic proxy locking to be disabled for all database
+** files (explicitly calling the SQLITE_FCNTL_SET_LOCKPROXYFILE pragma or
+** sqlite_file_control API is not affected by SQLITE_FORCE_PROXY_LOCKING).
+*/
+
+/*
+ * This is an OpenSSL-compatible implementation of the RSA Data Security, Inc.
+ * MD5 Message-Digest Algorithm (RFC 1321).
+ *
+ * Homepage:
+ * http://openwall.info/wiki/people/solar/software/public-domain-source-code/md5
+ *
+ * Author:
+ * Alexander Peslyak, better known as Solar Designer <solar at openwall.com>
+ *
+ * This software was written by Alexander Peslyak in 2001.  No copyright is
+ * claimed, and the software is hereby placed in the public domain.
+ * In case this attempt to disclaim copyright and place the software in the
+ * public domain is deemed null and void, then the software is
+ * Copyright (c) 2001 Alexander Peslyak and it is hereby released to the
+ * general public under the following terms:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted.
+ *
+ * There's ABSOLUTELY NO WARRANTY, express or implied.
+ *
+ * (This is a heavily cut-down "BSD license".)
+ *
+ * This differs from Colin Plumb's older public domain implementation in that
+ * no exactly 32-bit integer data type is required (any 32-bit or wider
+ * unsigned integer data type will do), there's no compile-time endianness
+ * configuration, and the function prototypes match OpenSSL's.  No code from
+ * Colin Plumb's implementation has been reused; this comment merely compares
+ * the properties of the two independent implementations.
+ *
+ * The primary goals of this implementation are portability and ease of use.
+ * It is meant to be fast, but not as fast as possible.  Some known
+ * optimizations are not included to reduce source code size and avoid
+ * compile-time configuration.
+ */
+
+/*
+By Steve Reid <sreid@sea-to-sky.net>
+100% Public Domain
+
+-----------------
+Modified 7/98
+By James H. Brown <jbrown@burgoyne.com>
+Still 100% Public Domain
+
+Corrected a problem which generated improper hash values on 16 bit machines
+Routine SHA1Update changed from
+  void SHA1Update(SHA1_CTX* context, unsigned char* data, unsigned int
+len)
+to
+  void SHA1Update(SHA1_CTX* context, unsigned char* data, unsigned
+long len)
+
+The 'len' parameter was declared an int which works fine on 32 bit machines.
+However, on 16 bit machines an int is too small for the shifts being done
+against
+it.  This caused the hash function to generate incorrect values if len was
+greater than 8191 (8K - 1) due to the 'len << 3' on line 3 of SHA1Update().
+
+Since the file IO in main() reads 16K at a time, any file 8K or larger would
+be guaranteed to generate the wrong hash (e.g. Test Vector #3, a million
+"a"s).
+
+I also changed the declaration of variables i & j in SHA1Update to
+unsigned long from unsigned int for the same reason.
+
+These changes should make no difference to any 32 bit implementations since
+an
+int and a long are the same size in those environments.
+
+--
+I also corrected a few compiler warnings generated by Borland C.
+1. Added #include <process.h> for exit() prototype
+2. Removed unused variable 'j' in SHA1Final
+3. Changed exit(0) to return(0) at end of main.
+
+ALL changes I made can be located by searching for comments containing 'JHB'
+-----------------
+Modified 8/98
+By Steve Reid <sreid@sea-to-sky.net>
+Still 100% public domain
+
+1- Removed #include <process.h> and used return() instead of exit()
+2- Fixed overwriting of finalcount in SHA1Final() (discovered by Chris Hall)
+3- Changed email address from steve@edmweb.com to sreid@sea-to-sky.net
+
+-----------------
+Modified 4/01
+By Saul Kravitz <Saul.Kravitz@celera.com>
+Still 100% PD
+Modified to run on Compaq Alpha hardware.
+
+-----------------
+Modified 07/2002
+By Ralph Giles <giles@artofcode.com>
+Still 100% public domain
+modified for use with stdint types, autoconf
+code cleanup, removed attribution comments
+switched SHA1Final() argument order for consistency
+use SHA1_ prefix for public api
+move public api to sha1.h
+
+-----------------
+Modified 02/2018
+By Ulrich Telle <github@telle-online.de>
+Still 100% public domain
+modified for use with fast-pbkdf2 (written by Joseph Birr-Pixton)
+detect endianess at run-time
+*/
+
+/*
+ * FIPS 180-2 SHA-224/256/384/512 implementation
+ * Last update: 02/02/2007
+ * Issue date:  04/30/2005
+ *
+ * Copyright (C) 2005, 2007 Olivier Gay <olivier.gay@a3.epfl.ch>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the project nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+/*
+ * fast-pbkdf2 - Optimal PBKDF2-HMAC calculation
+ * Written in 2015 by Joseph Birr-Pixton <jpixton@gmail.com>
+ *
+ * To the extent possible under law, the author(s) have dedicated all
+ * copyright and related and neighboring rights to this software to the
+ * public domain worldwide. This software is distributed without any
+ * warranty.
+ *
+ * You should have received a copy of the CC0 Public Domain Dedication
+ * along with this software. If not, see
+ * <http://creativecommons.org/publicdomain/zero/1.0/>.
+ */
+
+/*
+ * fastpbkdf2 - Faster PBKDF2-HMAC calculation
+ * Written in 2015 by Joseph Birr-Pixton <jpixton@gmail.com>
+ *
+ * To the extent possible under law, the author(s) have dedicated all
+ * copyright and related and neighboring rights to this software to the
+ * public domain worldwide. This software is distributed without any
+ * warranty.
+ *
+ * You should have received a copy of the CC0 Public Domain Dedication
+ * along with this software. If not, see
+ * <http://creativecommons.org/publicdomain/zero/1.0/>.
+ */
+
+/*
+/// \file rijndael.cpp Implementation of the Rijndael cipher
+//
+// File : rijndael.cpp
+// Creation date : Sun Nov 5 2000 03:22:10 CEST
+// Author : Szymon Stefanek (stefanek@tin.it)
+//
+// Another implementation of the Rijndael cipher.
+// This is intended to be an easily usable library file.
+// This code is public domain.
+// Based on the Vincent Rijmen and K.U.Leuven implementation 2.4.
+//
+// Original Copyright notice:
+//
+//    rijndael-alg-fst.c   v2.4   April '2000
+//    rijndael-alg-fst.h
+//    rijndael-api-fst.c
+//    rijndael-api-fst.h
+//
+//    Optimised ANSI C code
+//
+//    authors: v1.0: Antoon Bosselaers
+//             v2.0: Vincent Rijmen, K.U.Leuven
+//             v2.3: Paulo Barreto
+//             v2.4: Vincent Rijmen, K.U.Leuven
+//
+//    This code is placed in the public domain.
+//
+// This implementation works on 128 , 192 , 256 bit keys
+// and on 128 bit blocks
+*/
+
+/*
+// File : rijndael.h
+// Creation date : Sun Nov 5 2000 03:21:05 CEST
+// Author : Szymon Stefanek (stefanek@tin.it)
+//
+// Another implementation of the Rijndael cipher.
+// This is intended to be an easily usable library file.
+// This code is public domain.
+// Based on the Vincent Rijmen and K.U.Leuven implementation 2.4.
+//
+// Original Copyright notice:
+//
+//    rijndael-alg-fst.c   v2.4   April '2000
+//    rijndael-alg-fst.h
+//    rijndael-api-fst.c
+//    rijndael-api-fst.h
+//
+//    Optimised ANSI C code
+//
+//    authors: v1.0: Antoon Bosselaers
+//             v2.0: Vincent Rijmen, K.U.Leuven
+//             v2.3: Paulo Barreto
+//             v2.4: Vincent Rijmen, K.U.Leuven
+//
+//    This code is placed in the public domain.
+//
+
+//
+// This implementation works on 128 , 192 , 256 bit keys
+// and on 128 bit blocks
+//
+
+//
+// Example of usage:
+//
+//  // Input data
+//  unsigned char key[32];                       // The key
+//  initializeYour256BitKey();                   // Obviously initialized with sth
+//  const unsigned char * plainText = getYourPlainText(); // Your plain text
+//  int plainTextLen = strlen(plainText);        // Plain text length
+//
+//  // Encrypting
+//  Rijndael rin;
+//  unsigned char output[plainTextLen + 16];
+//
+//  rin.init(Rijndael::CBC,Rijndael::Encrypt,key,Rijndael::Key32Bytes);
+//  // It is a good idea to check the error code
+//  int len = rin.padEncrypt(plainText,len,output);
+//  if(len >= 0)useYourEncryptedText();
+//  else encryptError(len);
+//
+//  // Decrypting: we can reuse the same object
+//  unsigned char output2[len];
+//  rin.init(Rijndael::CBC,Rijndael::Decrypt,key,Rijndael::Key32Bytes));
+//  len = rin.padDecrypt(output,len,output2);
+//  if(len >= 0)useYourDecryptedText();
+//  else decryptError(len);
+//
+*/
+
+/*
+ * Argon2 reference source code package - reference C implementations
+ *
+ * Copyright 2015
+ * Daniel Dinu, Dmitry Khovratovich, Jean-Philippe Aumasson, and Samuel Neves
+ *
+ * You may use this work under the terms of a Creative Commons CC0 1.0
+ * License/Waiver or the Apache Public License 2.0, at your option. The terms of
+ * these licenses can be found at:
+ *
+ * - CC0 1.0 Universal : https://creativecommons.org/publicdomain/zero/1.0
+ * - Apache 2.0        : https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * You should have received a copy of both of these licenses along with this
+ * software. If not, they may be obtained at the above URLs.
+ */
+
+/*
+ * Example code for a decoder and encoder of "hash strings", with Argon2
+ * parameters.
+ *
+ * This code comprises three sections:
+ *
+ *   -- The first section contains generic Base64 encoding and decoding
+ *   functions. It is conceptually applicable to any hash function
+ *   implementation that uses Base64 to encode and decode parameters,
+ *   salts and outputs. It could be made into a library, provided that
+ *   the relevant functions are made public (non-static) and be given
+ *   reasonable names to avoid collisions with other functions.
+ *
+ *   -- The second section is specific to Argon2. It encodes and decodes
+ *   the parameters, salts and outputs. It does not compute the hash
+ *   itself.
+ *
+ * The code was originally written by Thomas Pornin <pornin@bolet.org>,
+ * to whom comments and remarks may be sent. It is released under what
+ * should amount to Public Domain or its closest equivalent; the
+ * following mantra is supposed to incarnate that fact with all the
+ * proper legal rituals:
+ *
+ * ---------------------------------------------------------------------
+ * This file is provided under the terms of Creative Commons CC0 1.0
+ * Public Domain Dedication. To the extent possible under law, the
+ * author (Thomas Pornin) has waived all copyright and related or
+ * neighboring rights to this file. This work is published from: Canada.
+ * ---------------------------------------------------------------------
+ *
+ * Copyright (c) 2015 Thomas Pornin
+ */
+
+/*
+** Name:        pbkdf2.c
+** Purpose:     Implementation of PBKDF2 algoritm with Ascon
+** Based on:    Public domain Ascon reference implementation
+**              and optimized variants for 32- and 64-bit
+**              (see https://github.com/ascon/ascon-c)
+**              and the paper "Additional Modes for ASCON Version 1.1"
+**              by Rhys Weatherley, Southern Storm Software, Pty Ltd.
+** Remarks:     API functions adapted for use in SQLite3 Multiple Ciphers
+** Created by:  Ulrich Telle
+** Copyright:   (c) 2023-2023 Ulrich Telle
+** License:     MIT
+*/
+
+/*
+** 2020-02-08 modified by Keith Medcalf who also disclaims all copyright
+** on the modifications and hereby places this code in the public domain
+**
+** This file contains the implementation of an SQLite virtual table for
+** reading VSV (Variably Separated Values), which are like CSV files,
+** but subtly different.  VSV supports a number of extensions to the
+** CSV format as well as more processing options.
+**
+** http:\\www.dessus.com\files\vsv.c
+**
+** Usage:
+**
+**  create virtual table temp.vsv using vsv(...);
+**  select * from vsv;
+**
+** The parameters to the vsv module (the vsv(...) part) are as follows:
+**
+**  filename=STRING     the filename, passed to the Operating System
+**  data=STRING         alternative data
+**  schema=STRING       Alternate Schema to use
+**  columns=N           columns parsed from the VSV file
+**  header=BOOL         whether or not a header row is present
+**  skip=N              number of leading data rows to skip
+**  rsep=STRING         record separator
+**  fsep=STRING         field separator
+**  validatetext=BOOL   validate UTF-8 encoding of text fields
+**  affinity=AFFINITY   affinity to apply to each returned value
+**  nulls=BOOL          empty fields are returned as NULL
+**
+**
+** Defaults:
+**
+**  filename / data     nothing.  You must provide one or the other
+**                      it is an error to provide both or neither
+**  schema              nothing.  If not provided then one will be
+**                      generated for you from the header, or if no
+**                      header is available then autogenerated using
+**                      field names manufactured as cX where X is the
+**                      column number
+**  columns             nothing.  If not specified then the number of
+**                      columns is determined by counting the fields
+**                      in the first record of the VSV file (which
+**                      will be the header row if header is specified),
+**                      the number of columns is not parsed from the
+**                      schema even if one is provided
+**  header=no           no header row in the VSV file
+**  skip=0              do not skip any data rows in the VSV file
+**  fsep=','            default field separator is a comma
+**  rsep='\n'           default record separator is a newline
+**  validatetext=no     do not validate text field encoding
+**  affinity=none       do not apply affinity to each returned value
+**  nulls=off           empty fields returned as zero-length
+**
+**
+** Parameter types:
+**
+**  STRING              means a quoted string
+**  N                   means a whole number not containing a sign
+**  BOOL                means something that evaluates as true or false
+**                          it is case insensitive
+**                          yes, no, true, false, 1, 0
+**  AFFINITY            means an SQLite3 type specification
+**                          it is case insensitive
+**                          none, blob, text, integer, real, numeric
+**
+** STRING means a quoted string.  The quote character may be either
+** a single quote or a double quote.  Two quote characters in a row
+** will be replaced with one quote character.  STRINGS do not
+** need to be quoted if it is obvious where they begin and end
+** (that is, they do not contain a comma or other character that the
+** parser treats especially, such as : or \).  Leading and trailing
+** spaces will be trimmed from unquoted strings.
+**
+**    filename =./this/filename.here, ...
+**    filename =./this/filename.here , ...
+**    filename = ./this/filename.here, ...
+**    filename = ./this/filename.here , ...
+**    filename = './this/filename.here', ...
+**    filename = "./this/filename.here", ...
+**
+**  are all equivalent.
+**
+** BOOL defaults to true so the following specifications are all the
+** same:
+**
+**  header = true
+**  header = yes
+**  header = 1
+**  header
+**
+**
+** Specific Parameters:
+**
+** The platform/compiler/OS fopen call is responsible for interpreting
+** the filename.  It may contain anything recognized by the OS.
+**
+** The separator string containing exactly one character, or a valid
+** escape sequence.  Recognized escape sequences are:
+**
+**  \t                  horizontal tab, ascii character 9 (0x09)
+**  \n                  linefeed, ascii character 10 (0x0a)
+**  \v                  vertical tab, ascii character 11 (0x0b)
+**  \f                  form feed, ascii character 12 (0x0c)
+**  \xhh                specific byte where hh is hexadecimal
+**
+** The validatetext setting will cause the validity of the field
+** encoding (not its contents) to be verified.  It effects how
+** fields that are supposed to contain text will be returned to
+** the SQLite3 library in order to prevent invalid utf8 data from
+** being stored or processed as if it were valid utf8 text.
+**
+** The nulls option will cause fields that do not contain anything
+** to return NULL rather than an empty result.  Two separators
+** side-by-each with no intervening characters at all will be
+** returned as NULL if nulls is true; if nulls is false or
+** the contents are explicity empty ("") then a 0 length blob
+** (if affinity=blob) or 0 length text string.
+**
+** For the affinity setting, the following processing is applied to
+** each value returned by the VSV virtual table:
+**
+**  none                no affinity is applied, all fields will be
+**                      returned as text just like in the original
+**                      csv module, embedded nulls will terminate
+**                      the text.  if validatetext is in effect then
+**                      an error will be thrown if the field does
+**                      not contain validly encoded text or contains
+**                      embedded nulls
+**
+**  blob                all fields will be returned as blobs
+**                      validatetext has no effect
+**
+**  text                all fields will be returned as text just
+**                      like in the original csv module, embedded
+**                      nulls will terminate the text.
+**                      if validatetext is in effect then a blob
+**                      will be returned if the field does not
+**                      contain validly encoded text or the field
+**                      contains embedded nulls
+**
+**  integer             if the field data looks like an integer,
+**                      (regex "^ *(\+|-)?\d+ *$"),
+**                      then an integer will be returned as
+**                      provided by the compiler and platform
+**                      runtime strtoll function
+**                      otherwise the field will be processed as
+**                      text as defined above
+**
+**  real                if the field data looks like a number,
+**                      (regex "^ *(\+|-)?(\d+\.?\d*|\d*\.?\d+)([eE](\+|-)?\d+)? *$")
+**                      then a double will be returned as
+**                      provided by the compiler and platform
+**                      runtime strtold function otherwise the
+**                      field will be processed as text as
+**                      defined above
+**
+**  numeric             if the field looks like an integer
+**                      (see integer above) that integer will be
+**                      returned
+**                      if the field looks like a number
+**                      (see real above) then the number will
+**                      returned as an integer if it has no
+**                      fractional part and
+**                      (a) your platform/compiler supports
+**                      long double and the number will fit in
+**                      a 64-bit integer; or,
+**                      (b) your platform/compiler does not
+**                      support long double (treats it as a double)
+**                      then a 64-bit integer will only be returned
+**                      for integers that can be represented in the
+**                      53 bit significand of a double
+**
+** The nulls option will cause fields that do not contain anything
+** to return NULL rather than an empty result.  Two separators
+** side-by-each with no intervening characters at all will be
+** returned as NULL if nulls is true; if nulls is false or
+** the contents are explicity empty ("") then a 0 length blob
+** (if affinity=blob) or 0 length text string will be returned.
+**
+*/
+
+/* miniz.c 2.2.0 - public domain deflate/inflate, zlib-subset, ZIP reading/writing/appending, PNG writing
+   See "unlicense" statement at the end of this file.
+   Rich Geldreich <richgel99@gmail.com>, last updated Oct. 13, 2013
+   Implements RFC 1950: http://www.ietf.org/rfc/rfc1950.txt and RFC 1951: http://www.ietf.org/rfc/rfc1951.txt
+
+   Most API's defined in miniz.c are optional. For example, to disable the archive related functions just define
+   MINIZ_NO_ARCHIVE_APIS, or to get rid of all stdio usage define MINIZ_NO_STDIO (see the list below for more macros).
+
+   * Low-level Deflate/Inflate implementation notes:
+
+     Compression: Use the "tdefl" API's. The compressor supports raw, static, and dynamic blocks, lazy or
+     greedy parsing, match length filtering, RLE-only, and Huffman-only streams. It performs and compresses
+     approximately as well as zlib.
+
+     Decompression: Use the "tinfl" API's. The entire decompressor is implemented as a single function
+     coroutine: see tinfl_decompress(). It supports decompression into a 32KB (or larger power of 2) wrapping buffer, or into a memory
+     block large enough to hold the entire file.
+
+     The low-level tdefl/tinfl API's do not make any use of dynamic memory allocation.
+
+   * zlib-style API notes:
+
+     miniz.c implements a fairly large subset of zlib. There's enough functionality present for it to be a drop-in
+     zlib replacement in many apps:
+        The z_stream struct, optional memory allocation callbacks
+        deflateInit/deflateInit2/deflate/deflateReset/deflateEnd/deflateBound
+        inflateInit/inflateInit2/inflate/inflateReset/inflateEnd
+        compress, compress2, compressBound, uncompress
+        CRC-32, Adler-32 - Using modern, minimal code size, CPU cache friendly routines.
+        Supports raw deflate streams or standard zlib streams with adler-32 checking.
+
+     Limitations:
+      The callback API's are not implemented yet. No support for gzip headers or zlib static dictionaries.
+      I've tried to closely emulate zlib's various flavors of stream flushing and return status codes, but
+      there are no guarantees that miniz.c pulls this off perfectly.
+
+   * PNG writing: See the tdefl_write_image_to_png_file_in_memory() function, originally written by
+     Alex Evans. Supports 1-4 bytes/pixel images.
+
+   * ZIP archive API notes:
+
+     The ZIP archive API's where designed with simplicity and efficiency in mind, with just enough abstraction to
+     get the job done with minimal fuss. There are simple API's to retrieve file information, read files from
+     existing archives, create new archives, append new files to existing archives, or clone archive data from
+     one archive to another. It supports archives located in memory or the heap, on disk (using stdio.h),
+     or you can specify custom file read/write callbacks.
+
+     - Archive reading: Just call this function to read a single file from a disk archive:
+
+      void *mz_zip_extract_archive_file_to_heap(const char *pZip_filename, const char *pArchive_name,
+        size_t *pSize, mz_uint zip_flags);
+
+     For more complex cases, use the "mz_zip_reader" functions. Upon opening an archive, the entire central
+     directory is located and read as-is into memory, and subsequent file access only occurs when reading individual files.
+
+     - Archives file scanning: The simple way is to use this function to scan a loaded archive for a specific file:
+
+     int mz_zip_reader_locate_file(mz_zip_archive *pZip, const char *pName, const char *pComment, mz_uint flags);
+
+     The locate operation can optionally check file comments too, which (as one example) can be used to identify
+     multiple versions of the same file in an archive. This function uses a simple linear search through the central
+     directory, so it's not very fast.
+
+     Alternately, you can iterate through all the files in an archive (using mz_zip_reader_get_num_files()) and
+     retrieve detailed info on each file by calling mz_zip_reader_file_stat().
+
+     - Archive creation: Use the "mz_zip_writer" functions. The ZIP writer immediately writes compressed file data
+     to disk and builds an exact image of the central directory in memory. The central directory image is written
+     all at once at the end of the archive file when the archive is finalized.
+
+     The archive writer can optionally align each file's local header and file data to any power of 2 alignment,
+     which can be useful when the archive will be read from optical media. Also, the writer supports placing
+     arbitrary data blobs at the very beginning of ZIP archives. Archives written using either feature are still
+     readable by any ZIP tool.
+
+     - Archive appending: The simple way to add a single file to an archive is to call this function:
+
+      mz_bool mz_zip_add_mem_to_archive_file_in_place(const char *pZip_filename, const char *pArchive_name,
+        const void *pBuf, size_t buf_size, const void *pComment, mz_uint16 comment_size, mz_uint level_and_flags);
+
+     The archive will be created if it doesn't already exist, otherwise it'll be appended to.
+     Note the appending is done in-place and is not an atomic operation, so if something goes wrong
+     during the operation it's possible the archive could be left without a central directory (although the local
+     file headers and file data will be fine, so the archive will be recoverable).
+
+     For more complex archive modification scenarios:
+     1. The safest way is to use a mz_zip_reader to read the existing archive, cloning only those bits you want to
+     preserve into a new archive using using the mz_zip_writer_add_from_zip_reader() function (which compiles the
+     compressed file data as-is). When you're done, delete the old archive and rename the newly written archive, and
+     you're done. This is safe but requires a bunch of temporary disk space or heap memory.
+
+     2. Or, you can convert an mz_zip_reader in-place to an mz_zip_writer using mz_zip_writer_init_from_reader(),
+     append new files as needed, then finalize the archive which will write an updated central directory to the
+     original archive. (This is basically what mz_zip_add_mem_to_archive_file_in_place() does.) There's a
+     possibility that the archive's central directory could be lost with this method if anything goes wrong, though.
+
+     - ZIP archive support limitations:
+     No spanning support. Extraction functions can only handle unencrypted, stored or deflated files.
+     Requires streams capable of seeking.
+
+   * This is a header file library, like stb_image.c. To get only a header file, either cut and paste the
+     below header, or create miniz.h, #define MINIZ_HEADER_FILE_ONLY, and then include miniz.c from it.
+
+   * Important: For best perf. be sure to customize the below macros for your target platform:
+     #define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 1
+     #define MINIZ_LITTLE_ENDIAN 1
+     #define MINIZ_HAS_64BIT_REGISTERS 1
+
+   * On platforms using glibc, Be sure to "#define _LARGEFILE64_SOURCE 1" before including miniz.c to ensure miniz
+     uses the 64-bit variants: fopen64(), stat64(), etc. Otherwise you won't be able to process large files
+     (i.e. 32-bit stat() fails for me on files > 0x7FFFFFFF bytes).
+*/
+
+/**************************************************************************
+ *
+ * Copyright 2013-2014 RAD Game Tools and Valve Software
+ * Copyright 2010-2014 Rich Geldreich and Tenacious Software LLC
+ * All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ **************************************************************************/
+
+/*
+  This is free and unencumbered software released into the public domain.
+
+  Anyone is free to copy, modify, publish, use, compile, sell, or
+  distribute this software, either in source code form or as a compiled
+  binary, for any purpose, commercial or non-commercial, and by any
+  means.
+
+  In jurisdictions that recognize copyright laws, the author or authors
+  of this software dedicate any and all copyright interest in the
+  software to the public domain. We make this dedication for the benefit
+  of the public at large and to the detriment of our heirs and
+  successors. We intend this dedication to be an overt act of
+  relinquishment in perpetuity of all present and future rights to this
+  software under copyright law.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  OTHER DEALINGS IN THE SOFTWARE.
+
+  For more information, please refer to <http://unlicense.org/>
+*/
+
+ /**************************************************************************
+ *
+ * Copyright 2013-2014 RAD Game Tools and Valve Software
+ * Copyright 2010-2014 Rich Geldreich and Tenacious Software LLC
+ * All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ **************************************************************************/
+
+ /**************************************************************************
+ *
+ * Copyright 2013-2014 RAD Game Tools and Valve Software
+ * Copyright 2010-2014 Rich Geldreich and Tenacious Software LLC
+ * Copyright 2016 Martin Raiber
+ * All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ **************************************************************************/
+
+Referenced license texts:
+
+Creative Commons Legal Code
+
+CC0 1.0 Universal
+
+    CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE
+    LEGAL SERVICES. DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN
+    ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS
+    INFORMATION ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRANTIES
+    REGARDING THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS
+    PROVIDED HEREUNDER, AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM
+    THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED
+    HEREUNDER.
+
+Statement of Purpose
+
+The laws of most jurisdictions throughout the world automatically confer
+exclusive Copyright and Related Rights (defined below) upon the creator
+and subsequent owner(s) (each and all, an "owner") of an original work of
+authorship and/or a database (each, a "Work").
+
+Certain owners wish to permanently relinquish those rights to a Work for
+the purpose of contributing to a commons of creative, cultural and
+scientific works ("Commons") that the public can reliably and without fear
+of later claims of infringement build upon, modify, incorporate in other
+works, reuse and redistribute as freely as possible in any form whatsoever
+and for any purposes, including without limitation commercial purposes.
+These owners may contribute to the Commons to promote the ideal of a free
+culture and the further production of creative, cultural and scientific
+works, or to gain reputation or greater distribution for their Work in
+part through the use and efforts of others.
+
+For these and/or other purposes and motivations, and without any
+expectation of additional consideration or compensation, the person
+associating CC0 with a Work (the "Affirmer"), to the extent that he or she
+is an owner of Copyright and Related Rights in the Work, voluntarily
+elects to apply CC0 to the Work and publicly distribute the Work under its
+terms, with knowledge of his or her Copyright and Related Rights in the
+Work and the meaning and intended legal effect of CC0 on those rights.
+
+1. Copyright and Related Rights. A Work made available under CC0 may be
+protected by copyright and related or neighboring rights ("Copyright and
+Related Rights"). Copyright and Related Rights include, but are not
+limited to, the following:
+
+  i. the right to reproduce, adapt, distribute, perform, display,
+     communicate, and translate a Work;
+ ii. moral rights retained by the original author(s) and/or performer(s);
+iii. publicity and privacy rights pertaining to a person's image or
+     likeness depicted in a Work;
+ iv. rights protecting against unfair competition in regards to a Work,
+     subject to the limitations in paragraph 4(a), below;
+  v. rights protecting the extraction, dissemination, use and reuse of data
+     in a Work;
+ vi. database rights (such as those arising under Directive 96/9/EC of the
+     European Parliament and of the Council of 11 March 1996 on the legal
+     protection of databases, and under any national implementation
+     thereof, including any amended or successor version of such
+     directive); and
+vii. other similar, equivalent or corresponding rights throughout the
+     world based on applicable law or treaty, and any national
+     implementations thereof.
+
+2. Waiver. To the greatest extent permitted by, but not in contravention
+of, applicable law, Affirmer hereby overtly, fully, permanently,
+irrevocably and unconditionally waives, abandons, and surrenders all of
+Affirmer's Copyright and Related Rights and associated claims and causes
+of action, whether now known or unknown (including existing as well as
+future claims and causes of action), in the Work (i) in all territories
+worldwide, (ii) for the maximum duration provided by applicable law or
+treaty (including future time extensions), (iii) in any current or future
+medium and for any number of copies, and (iv) for any purpose whatsoever,
+including without limitation commercial, advertising or promotional
+purposes (the "Waiver"). Affirmer makes the Waiver for the benefit of each
+member of the public at large and to the detriment of Affirmer's heirs and
+successors, fully intending that such Waiver shall not be subject to
+revocation, rescission, cancellation, termination, or any other legal or
+equitable action to disrupt the quiet enjoyment of the Work by the public
+as contemplated by Affirmer's express Statement of Purpose.
+
+3. Public License Fallback. Should any part of the Waiver for any reason
+be judged legally invalid or ineffective under applicable law, then the
+Waiver shall be preserved to the maximum extent permitted taking into
+account Affirmer's express Statement of Purpose. In addition, to the
+extent the Waiver is so judged Affirmer hereby grants to each affected
+person a royalty-free, non transferable, non sublicensable, non exclusive,
+irrevocable and unconditional license to exercise Affirmer's Copyright and
+Related Rights in the Work (i) in all territories worldwide, (ii) for the
+maximum duration provided by applicable law or treaty (including future
+time extensions), (iii) in any current or future medium and for any number
+of copies, and (iv) for any purpose whatsoever, including without
+limitation commercial, advertising or promotional purposes (the
+"License"). The License shall be deemed effective as of the date CC0 was
+applied by Affirmer to the Work. Should any part of the License for any
+reason be judged legally invalid or ineffective under applicable law, such
+partial invalidity or ineffectiveness shall not invalidate the remainder
+of the License, and in such case Affirmer hereby affirms that he or she
+will not (i) exercise any of his or her remaining Copyright and Related
+Rights in the Work or (ii) assert any associated claims and causes of
+action with respect to the Work, in either case contrary to Affirmer's
+express Statement of Purpose.
+
+4. Limitations and Disclaimers.
+
+ a. No trademark or patent rights held by Affirmer are waived, abandoned,
+    surrendered, licensed or otherwise affected by this document.
+ b. Affirmer offers the Work as-is and makes no representations or
+    warranties of any kind concerning the Work, express, implied,
+    statutory or otherwise, including without limitation warranties of
+    title, merchantability, fitness for a particular purpose, non
+    infringement, or the absence of latent or other defects, accuracy, or
+    the present or absence of errors, whether or not discoverable, all to
+    the greatest extent permissible under applicable law.
+ c. Affirmer disclaims responsibility for clearing rights of other persons
+    that may apply to the Work or any use thereof, including without
+    limitation any person's Copyright and Related Rights in the Work.
+    Further, Affirmer disclaims responsibility for obtaining any necessary
+    consents, permissions or other rights required for any use of the
+    Work.
+ d. Affirmer understands and acknowledges that Creative Commons is not a
+    party to this document and has no duty or obligation with respect to
+    this CC0 or use of the Work.
+
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.

@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="zh-CN" data-palette="ink" data-view="gallery">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>安册 · 移动界面提案</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --desk: #eceef1; --canvas: #f5f5f7; --paper: #fff; --ink: #23262c; --secondary: #5c6068;
+      --muted: #666d78; --line: #e4e5e9; --soft: #eff0f2; --accent: #345bb4;
+      --accent-soft: #e8efff; --amber: #805a1f; --input-border: #9a9faa;
+      --danger: #ac3745; --button: #345bb4; --button-ink: #fff;
+      --plate: #fff; --plate-ink: #23262c; --plate-muted: #5c6068; --plate-line: #e4e5e9;
+      --screen-width: 390px; --screen-height: 844px; --type-scale: 1;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-synthesis: none;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --desk: #111318; --canvas: #17191e; --paper: #22252b; --ink: #f0f1f4; --secondary: #c1c5cc;
+      --muted: #a6adb8; --line: #393d45; --soft: #2b3038; --accent: #b5caff;
+      --accent-soft: #2c3e63; --amber: #edc887; --input-border: #7c8594;
+      --danger: #f4a3ae; --button: #b5caff; --button-ink: #172747;
+      --plate: #22252b; --plate-ink: #f0f1f4; --plate-muted: #c1c5cc; --plate-line: #393d45;
+    }
+    :root[data-palette="cinnabar"] { --accent: #a7452f; --accent-soft: #fbede7; --button: #a7452f; }
+    :root[data-palette="ink"] { --accent: #43516a; --accent-soft: #e9edf4; --button: #43516a; }
+    :root[data-theme="dark"][data-palette="cinnabar"] { --accent: #f4b29b; --accent-soft: #47332c; --button: #f4b29b; --button-ink: #382117; }
+    :root[data-theme="dark"][data-palette="ink"] { --accent: #c7d2e5; --accent-soft: #344055; --button: #c7d2e5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--desk); color: var(--ink); }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+    button { border: 0; background: none; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .icon { display: inline-block; width: 24px; height: 24px; flex-shrink: 0; vertical-align: middle; }
+    .icon svg { display: block; width: 100%; height: 100%; }
+    .review { max-width: 1420px; margin: auto; padding: 0 48px 48px; }
+    .review-top { display: flex; justify-content: space-between; align-items: center; min-height: 84px; border-bottom: 1px solid var(--line); gap: 24px; }
+    .wordmark { display: flex; align-items: center; gap: 12px; font-weight: 650; font-size: 19px; letter-spacing: 2px; }
+    .wordmark .icon { color: var(--ink); }
+    .review-label { font-size: 12px; color: var(--secondary); letter-spacing: .08em; }
+    .intro { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 22px 28px; padding: 35px 0 28px; }
+    .eyebrow { color: var(--secondary); font-size: 11px; letter-spacing: .14em; margin: 0 0 12px; }
+    h1 { margin: 0; font-size: clamp(25px, 3vw, 34px); letter-spacing: -.04em; font-weight: 550; line-height: 1.4; }
+    .intro p { margin: 11px 0 0; color: var(--secondary); font-size: 13px; line-height: 1.8; }
+    .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .palette-bar { display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
+    .palette-button { display: flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 11px; font-size: 12px; border: 1px solid transparent; border-radius: 5px; }
+    .palette-button[aria-pressed="true"] { background: var(--paper); border-color: var(--line); }
+    .swatch { height: 9px; width: 9px; border-radius: 50%; background: var(--swatch); }
+    .preview-settings { max-width: 650px; }
+    .mobile-preview-toggle { display: none; }
+    .size-note { margin: 10px 0 0; font-size: 11px; color: var(--secondary); line-height: 1.7; }
+    .control, .control-label { min-height: 38px; padding: 0 12px; font-size: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; }
+    .control-label { display: flex; align-items: center; gap: 8px; }
+    .control-label select { border: 0; background: transparent; min-height: 36px; max-width: 126px; }
+    .control[aria-pressed="true"] { background: var(--button); color: var(--button-ink); border-color: var(--button); }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--screen-width) + 2px)), 1fr)); gap: 32px 26px; align-items: start; justify-items: center; }
+    .study { width: min(100%, calc(var(--screen-width) + 2px)); min-width: 0; }
+    .study-heading { display: flex; justify-content: space-between; margin: 0 0 12px; font-size: 12px; font-weight: 500; color: var(--secondary); }
+    .study-index { color: var(--muted); font-family: ui-monospace, monospace; font-size: 11px; }
+    .device { width: 100%; height: var(--screen-height); margin: 0 auto; display: flex; flex-direction: column; background: var(--canvas); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; position: relative; box-shadow: 0 8px 28px #24324a08; }
+    .statusbar { display: flex; justify-content: space-between; padding: 14px 22px 8px; font-size: 12px; font-weight: 650; align-items: center; flex: 0 0 38px; }
+    .status-right { display: flex; align-items: center; gap: 7px; }
+    .signal { display: flex; gap: 2px; align-items: flex-end; height: 11px; }
+    .signal b { width: 3px; background: currentColor; border-radius: 1px; }
+    .signal b:nth-child(1) { height: 4px; }.signal b:nth-child(2) { height: 7px; }.signal b:nth-child(3) { height: 10px; }
+    .battery { width: 21px; height: 10px; border: 1px solid currentColor; border-radius: 3px; padding: 1px; position: relative; }
+    .battery:before { content: ""; display: block; width: 85%; height: 100%; background: currentColor; border-radius: 1px; }
+    .battery:after { content: ""; position: absolute; right: -3px; width: 2px; height: 4px; top: 2px; background: currentColor; border-radius: 1px; }
+    .app { flex: 1; display: flex; flex-direction: column; min-height: 0; position: relative; font-size: calc(16px * var(--type-scale)); container-type: inline-size; }
+    .scroll { flex: 1; overflow-y: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+    .pad { padding-left: 20px; padding-right: 20px; }
+    .home-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 12px; padding-bottom: 14px; }
+    .home-header > div { min-width: 0; }
+    .home-title-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+    .app-name { font-size: 1.75em; font-weight: 600; letter-spacing: -.025em; line-height: 1.4; margin: 0; }
+    .collection-summary { color: var(--secondary); font-size: .8125em; line-height: 1.6; margin: 0; }
+    .header-add { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; padding: 0 13px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); font-size: .875em; font-weight: 550; flex-shrink: 0; }
+    .header-add b { font-size: 26px; line-height: 1; font-weight: 350; }
+    .search { display: flex; align-items: center; gap: 10px; background: var(--paper); border-radius: 12px; min-height: 52px; padding: 0 15px; }
+    .search .icon { width: 21px; height: 21px; color: var(--secondary); }
+    .search input { width: 100%; min-width: 0; border: 0; background: transparent; min-height: 50px; font-size: 1em; outline-offset: -2px; }
+    ::placeholder { color: var(--muted); opacity: 1; }
+    .reminder { display: flex; align-items: center; flex-wrap: wrap; text-align: left; gap: 6px; min-height: 48px; padding: 0; color: var(--secondary); font-size: .8125em; line-height: 1.6; }
+    .reminder > .icon { width: 17px; height: 17px; }
+    .arrow { color: var(--muted); font-size: 19px; line-height: 1; }
+    .section-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 10px; min-height: 48px; margin-top: 4px; padding: 0 4px; }
+    .section-head h3 { font-size: .875em; color: var(--secondary); margin: 0; font-weight: 500; }
+    .section-head .count { font-size: .8125em; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .section-head h3 .count { font-size: inherit; font-weight: 400; margin-left: 4px; }
+    .list-group, .field-group { background: var(--paper); border-radius: 14px; overflow: hidden; }
+    .list-row { width: 100%; text-align: left; position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 76px; padding: 14px 16px; background: var(--paper); }
+    .list-row + .list-row:before { content: ""; position: absolute; top: 0; left: 56px; right: 16px; height: 1px; background: var(--line); }
+    .row-icon { width: 24px; height: 24px; color: var(--secondary); }
+    .row-copy { flex: 1; min-width: 0; }
+    .row-title { display: block; font-size: 1.0625em; font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; }
+    .row-meta { display: block; color: var(--secondary); font-size: .875em; line-height: 1.5; margin-top: 3px; overflow-wrap: anywhere; }
+    .row-owner { color: var(--ink); font-weight: 500; }
+    .row-end { color: var(--muted); font-size: .8125em; flex-shrink: 0; max-width: 68px; line-height: 1.6; }
+    .row-end.expiry { display: flex; flex-wrap: wrap; gap: 0 .35em; max-width: 5em; color: var(--amber); font-weight: 550; }
+    .sub-filter { display: flex; align-items: center; border: 0; background: transparent; font-size: .8125em; color: var(--secondary); min-height: 48px; max-width: 140px; }
+    .home-bottom-space { height: 24px; }
+    .bottom-nav { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--paper); flex-shrink: 0; padding: 10px 12px max(12px, env(safe-area-inset-bottom)); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--secondary); min-height: 56px; padding: 0; font-size: .75em; }
+    .nav-item.active { color: var(--accent); font-weight: 600; }
+    .nav-item .icon { width: 56px; height: 30px; padding: 3px 16px; border-radius: 18px; }
+    .nav-item.active .icon { background: var(--accent-soft); }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 12px; min-height: 56px; flex-shrink: 0; }
+    .toolbar-title { font-size: .875em; color: var(--secondary); font-weight: 500; }
+    .icon-button { min-width: 48px; min-height: 48px; display: inline-flex; justify-content: center; align-items: center; padding: 8px; }
+    .back { font-size: 27px; font-weight: 350; }
+    [data-action="entry-close"] { font-size: 24px; }
+    #detail-content, #entry-form { width: 100%; max-width: 640px; margin-inline: auto; }
+    .detail-heading { display: flex; align-items: flex-start; gap: 12px; padding-top: 14px; padding-bottom: 20px; }
+    .identity-icon { display: grid; place-items: center; width: 46px; min-height: 46px; border-radius: 12px; background: var(--soft); color: var(--secondary); flex-shrink: 0; }
+    .identity-icon .icon { width: 28px; height: 28px; }
+    .identity-copy { min-width: 0; padding-top: 1px; }
+    .document-title { font-size: 1.5em; line-height: 1.45; letter-spacing: -.025em; font-weight: 600; margin: 0; overflow-wrap: anywhere; }
+    .detail-meta { display: flex; flex-wrap: wrap; gap: 5px 10px; color: var(--secondary); font-size: .875em; margin-top: 6px; line-height: 1.6; }
+    .plate { background: var(--plate); color: var(--plate-ink); border-radius: 14px; margin-bottom: 20px; }
+    .plate-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 7px; font-size: .875em; padding: 15px 16px 0; }
+    .plate-label { color: var(--plate-muted); font-size: .86em; display: flex; align-items: center; gap: 4px; }
+    .plate-label .icon { width: 14px; height: 14px; }
+    .number { min-height: 64px; display: flex; align-items: center; padding: 12px 16px; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 1.25em; font-weight: 500; letter-spacing: .025em; line-height: 1.7; overflow-wrap: anywhere; }
+    .plate-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--plate-line); }
+    .plate-actions button { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 48px; color: var(--accent); font-size: .875em; font-weight: 550; }
+    .plate-actions button + button { border-left: 1px solid var(--plate-line); }
+    .plate-actions .icon { width: 18px; height: 18px; }
+    .detail-section-title { font-weight: 550; font-size: .875em; color: var(--secondary); margin: 0 0 12px; padding-left: 4px; }
+    .field-group { padding: 0 16px; }
+    .field-row { display: grid; grid-template-columns: 70px minmax(0, 1fr) 48px; align-items: start; gap: 10px; min-height: 62px; padding: 18px 0; border-bottom: 1px solid var(--line); line-height: 1.75; font-size: .875em; }
+    .field-row:last-child { border: 0; }
+    .field-label { color: var(--secondary); }
+    .field-value { overflow-wrap: anywhere; font-size: 1.142857em; line-height: 1.55; }
+    .inline-copy { display: flex; justify-content: center; align-items: center; min-width: 48px; min-height: 48px; margin: -11px 0; color: var(--muted); }
+    .inline-copy .icon { width: 16px; height: 16px; }
+    .attachment-header { display: flex; align-items: center; justify-content: space-between; margin-top: 17px; min-height: 48px; padding-inline: 4px; }
+    .attachment-header h3 { margin: 0; color: var(--secondary); font-size: .875em; font-weight: 550; }
+    .attachment-header span { font-size: .8125em; color: var(--muted); }
+    .attachments { display: flex; flex-wrap: wrap; gap: 12px; padding: 0 0 8px; }
+    .attachment { min-width: 84px; min-height: 88px; padding: 12px; background: var(--paper); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; color: var(--secondary); font-size: .75em; }
+    .attachment .icon { width: 25px; height: 25px; color: var(--accent); }
+    .updated { margin: 16px 4px 25px; font-size: .75em; color: var(--muted); line-height: 1.7; }
+    .step-track { display: flex; align-items: center; gap: 0; margin: 6px 20px 25px; padding: 0; list-style: none; }
+    .step-track li { flex: 1; display: flex; align-items: center; gap: 5px; font-size: .75em; color: var(--muted); min-width: 0; }
+    .step-track li:not(:last-child):after { content: ""; flex: 1; height: 1px; background: var(--line); margin: 0 9px 0 4px; }
+    .step-track li.active { color: var(--accent); font-weight: 650; }
+    .step-track li.done { color: var(--secondary); }
+    .step-index { font-size: .95em; font-variant-numeric: tabular-nums; }
+    .entry-heading { margin: 0 0 7px; font-size: 1.5em; font-weight: 600; letter-spacing: -.025em; line-height: 1.5; }
+    .entry-subtitle { color: var(--secondary); margin: 0 0 23px; font-size: .8125em; line-height: 1.7; }
+    .form-section { margin-bottom: 20px; }
+    .form-section h4 { color: var(--secondary); font-weight: 550; font-size: .875em; margin: 0 4px 11px; }
+    .form-card { margin-bottom: 24px; }
+    .form-field { display: block; margin: 0 0 18px; }
+    .form-card .form-field:last-child { margin-bottom: 0; }
+    .form-label { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font-weight: 500; color: var(--secondary); font-size: .875em; margin-bottom: 8px; line-height: 1.6; }
+    .optional { font-size: .85em; color: var(--muted); font-weight: 400; }
+    .input { width: 100%; min-width: 0; min-height: 52px; background: var(--paper); border: 1px solid var(--input-border); border-radius: 8px; padding: 11px 12px; font-size: 1em; line-height: 1.6; }
+    .input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .input:focus-visible { outline: none; }
+    .form-field:focus-within .form-label { color: var(--accent); }
+    textarea.input { min-height: 112px; resize: vertical; }
+    .input.invalid { border-color: var(--danger); box-shadow: 0 0 0 1px var(--danger); }
+    .form-error { color: var(--danger); font-size: .8em; line-height: 1.6; margin: 7px 0 0; }
+    .form-help { color: var(--muted); font-size: .75em; line-height: 1.7; margin: 10px 4px 0; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 0 16px; }
+    .form-grid .form-field { margin-bottom: 0; }
+    .form-footer { padding: 14px 20px max(20px, env(safe-area-inset-bottom)); background: var(--canvas); flex-shrink: 0; }
+    .primary { background: var(--button); color: var(--button-ink); min-height: 52px; width: 100%; border-radius: 28px; font-size: .9375em; font-weight: 600; }
+    .secondary { min-height: 48px; padding: 9px 18px; border: 1px solid var(--line); border-radius: 8px; font-size: .87em; }
+    .footer-hint { font-size: .75em; color: var(--muted); text-align: center; margin: 10px 0 0; line-height: 1.6; }
+    .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr)); gap: 12px; }
+    .choice { text-align: left; padding: 16px; border: 1px solid transparent; border-radius: 16px; background: var(--paper); min-height: 108px; display: flex; flex-direction: column; gap: 13px; font-size: .9375em; }
+    .choice.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .choice .icon { width: 25px; height: 25px; color: var(--accent); }
+    .owner-choice { display: flex; align-items: center; gap: 13px; width: 100%; min-height: 76px; text-align: left; background: var(--paper); padding: 15px 16px; }
+    .owner-choice + .owner-choice { border-top: 1px solid var(--line); }
+    .avatar { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 50%; background: var(--soft); font-size: 14px; color: var(--secondary); }
+    .owner-choice.selected .avatar { color: var(--accent); background: var(--accent-soft); }
+    .owner-choice .check { margin-left: auto; color: var(--accent); }
+    .review-note { display: grid; grid-template-columns: 25px 1fr; gap: 8px; margin: 21px 4px 0; font-size: 12px; color: var(--secondary); line-height: 1.9; }
+    .note-number { font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); padding-top: 1px; }
+    .review-note b { color: var(--ink); display: block; font-weight: 550; }
+    .review-footer { border-top: 1px solid var(--line); padding-top: 22px; margin-top: 34px; display: flex; justify-content: space-between; gap: 15px; font-size: 11px; color: var(--secondary); line-height: 1.8; }
+    .review-footer a { color: inherit; }
+    .empty { text-align: left; padding: 44px 0; }
+    .empty .icon { width: 33px; height: 33px; color: var(--muted); margin-bottom: 20px; }
+    .empty h3 { font-size: 1.3em; margin: 0 0 10px; font-weight: 550; }
+    .empty p { color: var(--secondary); line-height: 1.9; font-size: .87em; margin: 0 0 24px; }
+    .empty .primary { width: auto; padding: 0 22px; }
+    .toast { position: absolute; z-index: 8; bottom: 110px; left: 24px; right: 24px; background: var(--ink); color: var(--paper); padding: 13px 16px; border-radius: 8px; text-align: center; font-size: 12px; line-height: 1.7; pointer-events: none; }
+    .sheet-shade { position: absolute; z-index: 10; inset: 0; display: flex; align-items: flex-end; background: #1d1b1955; }
+    .sheet { background: var(--paper); width: 100%; border-radius: 18px 18px 0 0; padding: 13px 24px 25px; max-height: 90%; overflow: auto; }
+    .sheet-handle { width: 30px; height: 3px; border-radius: 4px; background: var(--line); margin: 0 auto 21px; }
+    .sheet h3 { margin: 0 0 12px; font-size: 19px; font-weight: 600; }
+    .sheet p { line-height: 1.8; font-size: 13px; color: var(--secondary); margin: 0 0 20px; overflow-wrap: anywhere; }
+    .sheet .primary + .secondary { width: 100%; margin-top: 10px; }
+    .sheet .list-row { font-size: 14px; }
+    [hidden] { display: none !important; }
+    @container (max-width: 359px) {
+      .pad { padding-left: 18px; padding-right: 18px; }
+      .list-row { grid-template-columns: 28px minmax(0, 1fr); gap: 5px 10px; }
+      .row-end { grid-column: 2; justify-self: start; max-width: none; }
+      .field-row { grid-template-columns: minmax(0, 1fr) 48px; gap: 3px 10px; }
+      .field-label { grid-column: 1; }.field-value { grid-column: 1; }
+      .inline-copy { grid-column: 2; grid-row: span 2; }
+      .form-grid { grid-template-columns: 1fr; gap: 0; }
+      .step-track li { flex-direction: column; gap: 4px; position: relative; align-items: flex-start; }
+      .step-track li:not(:last-child):after { position: absolute; top: 7px; left: 24px; right: 12px; margin: 0; }
+    }
+    @container (min-width: 840px) {
+      #home-scroll { margin-left: 96px; }
+      .bottom-nav { position: absolute; inset: 0 auto 0 0; width: 96px; display: flex; flex-direction: column; gap: 16px; padding: 22px 12px; }
+      .nav-item { min-height: 60px; }
+    }
+    :root[data-large="true"] .form-grid { grid-template-columns: 1fr; gap: 0; }
+    :root[data-large="true"] .field-row { grid-template-columns: minmax(0, 1fr) 48px; gap: 3px 10px; }
+    :root[data-large="true"] .field-label, :root[data-large="true"] .field-value { grid-column: 1; }
+    :root[data-large="true"] .inline-copy { grid-column: 2; grid-row: span 2; }
+    :root[data-large="true"] .list-row { grid-template-columns: 28px minmax(0, 1fr); row-gap: 5px; }
+    :root[data-large="true"] .row-end { grid-column: 2; justify-self: start; max-width: none; }
+    :root[data-large="true"] .choices { grid-template-columns: 1fr; }
+    :root[data-large="true"] .step-track li { flex-direction: column; gap: 4px; align-items: flex-start; position: relative; }
+    :root[data-large="true"] .step-track li:not(:last-child):after { position: absolute; top: 8px; left: 28px; right: 12px; margin: 0; }
+    :root[data-view="single"] .gallery { grid-template-columns: minmax(0, 1fr); }
+    :root[data-view="single"] .study:not(.selected-study), :root[data-view="single"] .review-note { display: none; }
+    :root[data-view="gallery"] .screen-picker { display: none; }
+    @media (max-width: 1120px) {
+      .review { padding: 0 24px 35px; }.intro { align-items: flex-start; flex-direction: column; gap: 20px; }
+    }
+    @media (max-width: 680px) {
+      .review { padding: 0 16px 28px; }.review-top { min-height: 67px; }.review-label { font-size: 10px; }
+      .intro { padding: 25px 0; }.intro p { font-size: 12px; }.review-footer { flex-direction: column; }.controls { gap: 7px; }
+      .control, .control-label { padding: 0 10px; }.review-note { margin-top: 15px; }
+    }
+    @media (max-width: 900px), (max-height: 600px) {
+      :root[data-view="single"] .review { height: 100dvh; padding: 0; display: flex; flex-direction: column; }
+      :root[data-view="single"] .review-top, :root[data-view="single"] .intro-copy, :root[data-view="single"] .review-footer { display: none; }
+      :root[data-view="single"] .intro { padding: 7px 12px 9px; display: block; flex-shrink: 0; border-bottom: 1px solid var(--line); }
+      :root[data-view="single"] .palette-bar { margin-bottom: 5px; }
+      :root[data-view="single"] .size-note { display: none; }
+      :root[data-view="single"] .height-picker { display: none; }
+      :root[data-view="single"] .gallery { min-height: 0; flex: 1; display: flex; flex-direction: column; }
+      :root[data-view="single"] .study.selected-study { width: 100%; min-height: 0; flex: 1; display: flex; flex-direction: column; }
+      :root[data-view="single"] .study-heading { margin: 0; padding: 9px 14px; font-size: 11px; }
+      :root[data-view="single"] .device { width: min(100%, var(--screen-width)); min-height: 0; flex: 1; height: auto; border-radius: 0; border: 0; box-shadow: none; }
+      :root[data-view="single"] .statusbar { display: none; }
+      :root[data-view="single"] .control, :root[data-view="single"] .control-label { font-size: 11px; }
+      :root[data-view="single"] .mobile-preview-toggle { display: block; margin-left: auto; }
+      :root[data-view="single"]:not([data-config-open="true"]) .palette-bar,
+      :root[data-view="single"]:not([data-config-open="true"]) .controls > :not(.screen-picker):not(.mobile-preview-toggle) { display: none; }
+    }
+    @media (prefers-reduced-motion: no-preference) { button, input { transition: background-color .15s, border-color .15s; } button:hover { filter: brightness(.96); } }
+  </style>
+</head>
+<body>
+  <main class="review">
+    <header class="review-top">
+      <div class="wordmark"><span data-icon="notebook-linear"></span>安册</div>
+      <span class="review-label">界面提案 04 ／ 内容优先</span>
+    </header>
+    <section class="intro" aria-label="设计提案与预览选项">
+      <div class="intro-copy">
+        <p class="eyebrow">安册 ／ 移动界面</p>
+        <h1>清楚、熟悉，随手可用。</h1>
+        <p>资料更早进入视线，常规提醒保持安静。查看与填写各有清楚的表达。</p>
+      </div>
+      <div class="preview-settings">
+      <div class="palette-bar" aria-label="比较配色">
+        <button class="palette-button" data-palette="cobalt" aria-pressed="false"><span class="swatch" style="--swatch:#345bb4"></span>清蓝</button>
+        <button class="palette-button" data-palette="cinnabar" aria-pressed="false"><span class="swatch" style="--swatch:#a7452f"></span>暖橙</button>
+        <button class="palette-button" data-palette="ink" aria-pressed="true"><span class="swatch" style="--swatch:#43516a"></span>石墨</button>
+      </div>
+      <div class="controls">
+        <label class="control-label">预览<select id="view-mode" aria-label="预览模式"><option value="gallery">三屏对比</option><option value="single">单屏体验</option></select></label>
+        <label class="control-label screen-picker">页面<select id="screen-picker" aria-label="单屏预览页面"><option value="home">首页</option><option value="detail">详情</option><option value="entry">录入</option></select></label>
+        <label class="control-label">内容<select id="scenario" aria-label="样张内容状态"><option value="normal">日常资料</option><option value="empty">空白状态</option><option value="long">长内容</option></select></label>
+        <label class="control-label">宽度<select id="width" aria-label="样张窗口宽度"><option value="390">390</option><option value="320">320</option><option value="360">360</option><option value="430">430</option><option value="600">600</option><option value="840">840</option><option value="auto">跟随窗口</option></select></label>
+        <label class="control-label height-picker">高度<select id="height" aria-label="样张窗口高度"><option value="844">844</option><option value="740">740</option><option value="932">932</option></select></label>
+        <button class="control" id="theme-toggle" aria-pressed="false">暗色</button>
+        <label class="control-label">字号<select id="font-scale" aria-label="字号倍率"><option value="1">1.0 倍</option><option value="1.3">1.3 倍</option><option value="2">2.0 倍</option></select></label>
+        <button class="control mobile-preview-toggle" id="preview-settings-toggle" aria-expanded="false">预览设置</button>
+      </div>
+      <p class="size-note">按逻辑像素原尺寸排版，不缩放手机画面。标题旁显示实测内容宽度；手机打开默认单屏，随可用高度伸缩。</p>
+      </div>
+    </section>
+    <div class="gallery">
+      <section class="study selected-study" data-screen="home" aria-labelledby="home-study-title">
+        <h2 class="study-heading" id="home-study-title"><span>查找资料</span><span class="study-index"><span data-size="home">—</span> ／ 首页</span></h2>
+        <div class="device" id="home-device">
+          <div class="statusbar" aria-hidden="true"><span>9:41</span><div class="status-right"><span class="signal"><b></b><b></b><b></b></span><span class="battery"></span></div></div>
+          <div class="app" id="home-app">
+            <div class="scroll" id="home-scroll">
+              <header class="home-header pad"><div class="home-title-line"><h2 class="app-name" id="home-title">安册</h2><span class="collection-summary" id="collection-summary">6 份资料</span></div><button class="header-add" data-action="new-entry" aria-label="新增资料"><b aria-hidden="true">＋</b>新增</button></header>
+              <div class="pad"><label class="search"><span data-icon="magnifer-linear"></span><input type="search" id="search" placeholder="找一份资料" aria-label="搜索虚构资料" autocomplete="off"></label></div>
+              <div class="pad" id="home-content"></div>
+            </div>
+            <nav class="bottom-nav" aria-label="主导航">
+              <button class="nav-item active" data-tab="home" aria-current="page"><span data-icon="home-2-bold"></span>首页</button>
+              <button class="nav-item" data-tab="members"><span data-icon="users-group-rounded-linear"></span>成员</button>
+              <button class="nav-item" data-tab="types"><span data-icon="folder-with-files-linear"></span>分类</button>
+              <button class="nav-item" data-tab="settings"><span data-icon="user-rounded-linear"></span>设置</button>
+            </nav>
+          </div>
+        </div>
+        <div class="review-note"><span class="note-number">01</span><div><b>先看到资料，再看辅助信息。</b>页头紧凑，常规到期事项并入分组标题行。成员归属更清晰，类型图标保持中性。</div></div>
+      </section>
+      <section class="study" data-screen="detail" aria-labelledby="detail-study-title">
+        <h2 class="study-heading" id="detail-study-title"><span>查看与复制</span><span class="study-index"><span data-size="detail">—</span> ／ 详情</span></h2>
+        <div class="device" id="detail-device">
+          <div class="statusbar" aria-hidden="true"><span>9:41</span><div class="status-right"><span class="signal"><b></b><b></b><b></b></span><span class="battery"></span></div></div>
+          <div class="app">
+            <header class="toolbar"><button class="icon-button back" data-action="back-home" aria-label="返回首页">←</button><span class="toolbar-title">资料详情</span><button class="icon-button" data-action="edit" aria-label="编辑资料"><span data-icon="pen-linear"></span></button></header>
+            <div class="scroll pad" id="detail-content"></div>
+          </div>
+        </div>
+        <div class="review-note"><span class="note-number">02</span><div><b>号码突出，留白适量。</b>压缩号码区与标题区的空白，保留完整内容、查看与复制。只读字段通过分组和对齐组织。</div></div>
+      </section>
+      <section class="study" data-screen="entry" aria-labelledby="entry-study-title">
+        <h2 class="study-heading" id="entry-study-title"><span>新增与编辑</span><span class="study-index"><span data-size="entry">—</span> ／ 录入</span></h2>
+        <div class="device" id="entry-device">
+          <div class="statusbar" aria-hidden="true"><span>9:41</span><div class="status-right"><span class="signal"><b></b><b></b><b></b></span><span class="battery"></span></div></div>
+          <div class="app">
+            <header class="toolbar"><button class="icon-button back" data-action="entry-back" aria-label="上一步">←</button><span class="toolbar-title" id="entry-toolbar-title">新增资料</span><button class="icon-button" data-action="entry-close" aria-label="退出录入">×</button></header>
+            <ol class="step-track" aria-label="录入步骤" id="step-track"></ol>
+            <form class="scroll pad" id="entry-form" novalidate></form>
+            <footer class="form-footer"><button class="primary" id="entry-next" type="submit" form="entry-form">下一步</button><p class="footer-hint" id="entry-footer-hint">下一步添加备注与附件</p></footer>
+          </div>
+        </div>
+        <div class="review-note"><span class="note-number">03</span><div><b>填写有边界，焦点有反馈。</b>输入项使用独立轮廓，聚焦时边框与标签共同响应。日期按空间重排，输入内容保持可读。</div></div>
+      </section>
+    </div>
+    <footer class="review-footer"><span>设计预览 · 数据与附件均为虚构 · 刷新即还原 · 不保存或上传输入内容</span><span>图标：Solar 1.2.5 · <a href="assets/solar/1.2.5/NOTICE.md">来源与许可</a></span></footer>
+  </main>
+  <script src="assets/solar/1.2.5/icons.js"></script>
+  <script>
+    'use strict';
+    const $ = selector => document.querySelector(selector);
+    const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const icon = (name, extra = '') => `<span class="icon ${extra}" aria-hidden="true"><svg viewBox="0 0 24 24">${window.ANCH_SOLAR_ICONS.icons[name].body}</svg></span>`;
+    function hydrateIcons(root = document) {
+      root.querySelectorAll('[data-icon]').forEach(node => {
+        node.classList.add('icon'); node.setAttribute('aria-hidden', 'true');
+        node.innerHTML = `<svg viewBox="0 0 24 24">${window.ANCH_SOLAR_ICONS.icons[node.dataset.icon].body}</svg>`;
+      });
+    }
+    const records = [
+      { id:'id', title:'居民身份证', owner:'林安', category:'证件', icon:'user-id-linear', meta:'林安 · 身份证', date:'2034.06.18', pinned:true },
+      { id:'bank', title:'日常储蓄卡', owner:'林安', category:'银行卡', icon:'card-linear', meta:'林安 · 示例银行 · 尾号 0000', pinned:true },
+      { id:'insurance', title:'家庭医疗保险', owner:'家庭', category:'保险', icon:'shield-user-linear', meta:'家庭 · 医疗险', date:'2026.11.02', due:true },
+      { id:'passport', title:'普通护照', owner:'周宁', category:'证件', icon:'passport-linear', meta:'周宁 · 护照', date:'2031.08.21' },
+      { id:'address', title:'家里的收货地址', owner:'家庭', category:'地址', icon:'home-2-linear', meta:'家庭 · 海棠路 18 号' },
+      { id:'car', title:'家用车行驶证', owner:'家庭', category:'车辆', icon:'wheel-linear', meta:'家庭 · 行驶证' }
+    ];
+    const state = { scenario:'normal', tab:'home', selected:'id', revealed:false, step:2, type:'身份证', owner:'林安', editing:false, draft:{ name:'林安', number:'', start:'2014-06-18', end:'2034-06-18', address:'', note:'' }, dirty:false, memberFilter:'', expiryOnly:false, filter:'全部成员' };
+    function titleFor(record) { return state.scenario === 'long' && record.id === 'insurance' ? '家庭长期医疗保障保险（含门诊与住院补充保障）' : state.scenario === 'long' && record.id === 'id' ? '居民身份证（异地换领后留存资料）' : record.title; }
+    function row(record) {
+      const description = record.meta.replace(`${record.owner} · `,'');
+      const extra = record.title.includes(description) ? '' : ` · ${escapeHTML(description)}`;
+      return `<button class="list-row" data-record="${record.id}">${icon(record.icon,'row-icon')}<span class="row-copy"><span class="row-title">${escapeHTML(titleFor(record))}</span><span class="row-meta"><span class="row-owner">${escapeHTML(record.owner)}</span>${extra}</span></span>${record.due ? '<span class="row-end expiry"><span>14 天后</span><span>到期</span></span>' : ''}</button>`;
+    }
+    function renderHome() {
+      const content = $('#home-content');
+      $('#home-title').textContent = ({home:'安册', members:'成员', types:'分类', settings:'设置'})[state.tab];
+      $('.header-add').hidden = state.tab === 'settings';
+      $('#collection-summary').textContent = ({home:`${state.scenario === 'empty' ? 0 : records.length} 份资料`, members:'3 位归属',types:'5 类资料',settings:'本机设置'})[state.tab];
+      if (state.tab === 'members' && !state.memberFilter) {
+        content.innerHTML = '<div class="section-head"><h3>资料归属</h3><span class="count">3 位</span></div><div class="list-group">' + ['林安','周宁','家庭'].map(name => `<button class="owner-choice" data-member="${name}"><span class="avatar">${name === '家庭' ? icon('home-2-linear') : name.slice(0,1)}</span><span class="row-copy"><span class="row-title">${name}</span><span class="row-meta">${state.scenario === 'empty' ? 0 : records.filter(r => r.owner === name).length} 份资料</span></span><span class="arrow">›</span></button>`).join('') + '</div>'; return;
+      }
+      if (state.tab === 'types' && !state.memberFilter) {
+        content.innerHTML = '<div class="section-head"><h3>资料类型</h3><span class="count">5 类</span></div><div class="list-group">' + ['证件','银行卡','保险','地址','车辆'].map(name => `<button class="list-row" data-category="${name}">${icon(records.find(r => r.category === name).icon,'row-icon')}<span class="row-copy"><span class="row-title">${name}</span></span><span class="row-end">${state.scenario === 'empty' ? 0 : records.filter(r => r.category === name).length} 份</span></button>`).join('') + '</div>'; return;
+      }
+      if (state.tab === 'settings') {
+        content.innerHTML = '<div class="section-head"><h3>安全与资料</h3></div><div class="list-group">' + [['lock-linear','应用锁','PIN 与生物识别'],['archive-linear','数据与备份','导出与恢复'],['eye-linear','屏幕内容保护','查看当前选项']].map(([glyph,title,desc]) => `<button class="list-row" data-setting="${title}">${icon(glyph,'row-icon')}<span class="row-copy"><span class="row-title">${title}</span><span class="row-meta">${desc}</span></span><span class="arrow">›</span></button>`).join('') + '</div>'; return;
+      }
+      const query = $('#search').value.trim().toLowerCase();
+      if (state.scenario === 'empty') {
+        content.innerHTML = `<div class="empty">${icon('notebook-linear')}<h3>从第一份资料开始</h3><p>把常用证件、银行卡或家庭地址<br>收在这里，需要时就能找到。</p><button class="primary" data-action="new-entry">添加一份资料</button></div>`; return;
+      }
+      const visible = records.filter(r => (!query || (titleFor(r)+r.meta).toLowerCase().includes(query)) && (!state.expiryOnly || r.due) && (!state.memberFilter || r.owner === state.memberFilter || r.category === state.memberFilter) && (state.filter === '全部成员' || r.owner === state.filter));
+      const scoped = query || state.expiryOnly || state.memberFilter || state.filter !== '全部成员';
+      const remaining = scoped ? visible : visible.filter(r => !r.pinned);
+      content.innerHTML = (state.memberFilter || state.expiryOnly ? '<button class="sub-filter" data-action="clear-filter">← 返回全部</button>' : '') + (!scoped ? `<div class="section-head"><h3>置顶 <span class="count">2</span></h3><button class="reminder" data-action="expiry">${icon('clock-circle-linear')}<span>1 份将到期</span></button></div><div class="list-group">` + visible.filter(r => r.pinned).map(row).join('') + '</div>' : '') + `<div class="section-head"><h3>${query ? '搜索结果' : state.expiryOnly ? '近期到期' : state.memberFilter || (scoped ? '全部资料' : '其他资料')} <span class="count">${remaining.length}</span></h3><select class="sub-filter" id="member-filter" aria-label="按归属筛选">${['全部成员','林安','周宁','家庭'].map(name => `<option${state.filter === name ? ' selected' : ''}>${name}</option>`).join('')}</select></div>` + (remaining.length ? '<div class="list-group">' + remaining.map(row).join('') + '</div>' : '<div class="empty"><h3>没有找到资料</h3><p>试试资料名称、类型或成员。</p><button class="secondary" data-action="clear-filter">清除搜索与筛选</button></div>') + '<div class="home-bottom-space"></div>';
+    }
+    function detailField(label, value, canCopy = false) { return `<div class="field-row"><span class="field-label">${label}</span><span class="field-value">${escapeHTML(value)}</span>${canCopy ? `<button class="inline-copy" data-action="copy-field" aria-label="复制${label}">${icon('copy-linear')}</button>` : '<span></span>'}</div>`; }
+    function renderDetail() {
+      const record = records.find(r => r.id === state.selected);
+      const content = $('#detail-content');
+      if (state.scenario === 'empty') { content.innerHTML = `<div class="empty">${icon('document-text-linear')}<h3>资料详情会在这里展开</h3><p>先添加一份资料，再查看字段、<br>复制信息或添加附件。</p><button class="primary" data-action="new-entry">添加资料</button></div>`; return; }
+      const sensitive = ['id','bank','passport'].includes(record.id);
+      const label = record.id === 'bank' ? '银行卡号' : record.id === 'passport' ? '护照号码' : '身份证号码';
+      const value = record.id === 'bank' ? '0000 0000 0000 0000' : record.id === 'passport' ? 'EX 0000000' : '000000 19900101 0000';
+      const fields = record.id === 'address'
+        ? detailField('收件人','林安',true) + detailField('联系电话','000 0000 0000',true) + detailField('所在地区','示例省 示例市 海棠区') + detailField('详细地址',state.scenario === 'long' ? '海棠路十八号听雨花园第三期二十六幢二单元一千零二室（请从小区东门进入，工作日请放在楼下指定收件处）' : '海棠路 18 号 听雨花园 2 幢 1002 室',true)
+        : detailField(record.id === 'insurance' ? '险种' : '姓名', record.id === 'insurance' ? '医疗险' : record.owner, true) + detailField('有效期限',record.date ? `至 ${record.date}` : '长期') + detailField('备注',state.scenario === 'long' ? '虚构的长内容示例。资料字段可以自然换行，查看与复制按钮不会遮挡文字，也不需要横向拖动。' : '日常备用资料');
+      content.innerHTML = `<div class="detail-heading"><div class="identity-icon">${icon(record.icon)}</div><div class="identity-copy"><h2 class="document-title">${escapeHTML(titleFor(record))}</h2><div class="detail-meta"><span>${record.owner} · ${record.category}</span>${record.due ? '<span>14 天后到期</span>' : ''}</div></div></div>`
+        + (sensitive ? `<section class="plate" aria-label="关键号码"><div class="plate-top"><span>${label}</span><span class="plate-label">${icon('lock-linear')}${state.revealed ? '已显示' : '已隐藏'}</span></div><div class="number" id="sensitive-number">${state.revealed ? value : '•••••• •••••••• 0000'}</div><div class="plate-actions"><button data-action="reveal" aria-pressed="${state.revealed}">${icon(state.revealed ? 'eye-closed-linear' : 'eye-linear')}${state.revealed ? '隐藏' : '查看'}</button><button data-action="copy-number">${icon('copy-linear')}复制</button></div></section>` : '')
+        + '<h3 class="detail-section-title">基本信息</h3><div class="field-group">' + fields + '</div>'
+        + `<div class="attachment-header"><h3>附件</h3><span>2 份</span></div><div class="attachments"><button class="attachment" data-action="attachment">${icon('user-id-linear')}正面示意</button><button class="attachment" data-action="attachment">${icon('document-text-linear')}背面示意</button></div><p class="updated">更新于 2026 年 10 月 19 日</p>`;
+    }
+    const typeOptions = [['身份证','user-id-linear'],['银行卡','card-linear'],['保险单','shield-user-linear'],['收货地址','home-2-linear']];
+    function inputField(key, label, placeholder, optional = false, type = 'text') {
+      const numeric = key === 'number' ? ' inputmode="numeric"' : '';
+      return `<label class="form-field"><span class="form-label">${label}${optional ? '<span class="optional">可选</span>' : ''}</span><input class="input" name="${key}" type="${type}" value="${escapeHTML(state.draft[key] || '')}" placeholder="${placeholder}"${numeric} autocomplete="off"></label>`;
+    }
+    function renderEntry() {
+      const labels = ['类型','归属','填写','补充'];
+      $('#step-track').innerHTML = labels.map((label,index) => `<li class="${index === state.step ? 'active' : index < state.step ? 'done' : ''}"${index === state.step ? ' aria-current="step"' : ''}><span class="step-index">${index < state.step ? '✓' : `0${index+1}`}</span>${label}</li>`).join('');
+      $('#entry-toolbar-title').textContent = state.editing ? '编辑资料' : '新增资料';
+      $('#entry-next').textContent = state.step === 3 ? (state.editing ? '保存修改' : '保存资料') : '下一步';
+      $('#entry-footer-hint').textContent = ['下一步选择资料归属','下一步填写资料内容','下一步添加备注与附件','演示输入仅保留在当前页面内存'][state.step];
+      const form = $('#entry-form');
+      if (state.step === 0) {
+        form.innerHTML = '<h2 class="entry-heading">要收好哪种资料？</h2><p class="entry-subtitle">选择类型，按对应字段填写。</p><div class="choices">' + typeOptions.map(([name,glyph]) => `<button type="button" class="choice ${state.type === name ? 'selected' : ''}" data-type="${name}" aria-pressed="${state.type === name}">${icon(glyph)}${name}</button>`).join('') + '</div>'; return;
+      }
+      if (state.step === 1) {
+        form.innerHTML = '<h2 class="entry-heading">这是谁的资料？</h2><p class="entry-subtitle">选择个人，或归入家庭共同资料。</p><div class="list-group">' + ['林安','周宁','家庭'].map(name => `<button type="button" class="owner-choice ${state.owner === name ? 'selected' : ''}" data-owner="${name}" aria-pressed="${state.owner === name}"><span class="avatar">${name === '家庭' ? icon('home-2-linear') : name.slice(0,1)}</span><span>${name}</span>${state.owner === name ? icon('check-circle-linear','check') : ''}</button>`).join('') + '</div>'; return;
+      }
+      if (state.step === 3) {
+        form.innerHTML = `<h2 class="entry-heading">补充资料</h2><p class="entry-subtitle">备注和附件都可以稍后添加。</p><div class="form-card"><label class="form-field"><span class="form-label">备注<span class="optional">可选</span></span><textarea class="input" name="note" placeholder="添加方便自己识别的说明">${escapeHTML(state.draft.note)}</textarea></label></div><div class="form-section"><h4>附件 · 可选</h4><button type="button" class="attachment" data-action="entry-attachment">${icon('add-circle-linear')}添加附件</button><p class="form-help">附件保存在应用内部，不进入系统相册。</p></div>`; return;
+      }
+      let fields, extra = '';
+      if (state.type === '银行卡') {
+        fields = inputField('name','持卡人','请输入姓名') + inputField('number','银行卡号','请输入卡号');
+        extra = '<p class="form-help">不要保存支付密码、验证码或 CVV。</p>';
+      } else if (state.type === '收货地址') fields = inputField('name','收件人','请输入姓名') + inputField('address','详细地址','请输入虚构地址');
+      else if (state.type === '保险单') fields = inputField('name','保单名称','请输入名称') + inputField('number','保单号码','请输入虚构保单号') + inputField('end','保障截止日','',false,'date');
+      else {
+        fields = inputField('name','姓名','与证件上的姓名一致') + inputField('number','身份证号码','请输入证件号码');
+        extra = '<div class="form-section"><h4>有效期限</h4><div class="form-card form-grid">' + inputField('start','起始日期','',false,'date') + inputField('end','截止日期','',false,'date') + '</div></div><div class="form-card">' + inputField('address','登记地址','可稍后补充',true) + '</div>';
+      }
+      form.innerHTML = `<h2 class="entry-heading">${state.type === '身份证' ? '填写证件信息' : '填写资料信息'}</h2><p class="entry-subtitle">${escapeHTML(state.owner)} · ${escapeHTML(state.type)}${state.editing ? ' · 编辑' : ''}</p><div class="form-card">${fields}</div>${extra}<p class="form-help">此页面仅使用虚构资料进行演示。</p>`;
+    }
+    const toastTimers = new WeakMap();
+    function toast(device, message) {
+      device.querySelector('.toast')?.remove(); clearTimeout(toastTimers.get(device));
+      const node = document.createElement('div'); node.className = 'toast'; node.setAttribute('role','status'); node.textContent = message; device.append(node);
+      toastTimers.set(device, setTimeout(() => node.remove(), 2800));
+    }
+    function sheet(device, title, body, confirmLabel = '知道了', onConfirm) {
+      device.querySelector('.sheet-shade')?.remove();
+      const shade = document.createElement('div'); shade.className = 'sheet-shade';
+      shade.innerHTML = `<section class="sheet" role="dialog" aria-modal="true" aria-label="${escapeHTML(title)}"><div class="sheet-handle"></div><h3>${escapeHTML(title)}</h3>${body}<button class="primary" data-sheet-confirm>${escapeHTML(confirmLabel)}</button><button class="secondary" data-sheet-close>取消</button></section>`;
+      const previousFocus = document.activeElement;
+      const close = () => { shade.remove(); previousFocus?.focus(); };
+      shade.querySelector('[data-sheet-close]').onclick = close;
+      shade.querySelector('[data-sheet-confirm]').onclick = () => { close(); onConfirm?.(); };
+      shade.addEventListener('click', event => { if (event.target === shade) close(); });
+      shade.addEventListener('keydown', event => {
+        if (event.key === 'Escape') close();
+        if (event.key === 'Tab') {
+          const buttons = shade.querySelectorAll('button'); const first = buttons[0], last = buttons[buttons.length-1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+      device.append(shade); shade.querySelector('[data-sheet-confirm]').focus();
+    }
+    function selectScreen(name) {
+      $('#screen-picker').value = name;
+      document.querySelectorAll('.study').forEach(node => node.classList.toggle('selected-study',node.dataset.screen === name));
+    }
+    function focusStudy(id) {
+      const device = $(id);
+      if (document.documentElement.dataset.view === 'single') selectScreen(device.closest('.study').dataset.screen);
+      else device.scrollIntoView({block:'center', behavior:'instant'});
+    }
+    function newEntry() {
+      const open = () => { state.step = 0; state.editing = false; state.dirty = false; state.draft = {name:'', number:'', start:'', end:'', address:'', note:''}; renderEntry(); focusStudy('#entry-device'); };
+      if (state.dirty) sheet($('#entry-device'),'放弃未保存的内容？','<p>继续新增将清空当前演示输入。</p>','放弃并新增',open); else open();
+    }
+    document.addEventListener('click', event => {
+      const recordButton = event.target.closest('[data-record]');
+      if (recordButton) { state.selected = recordButton.dataset.record; state.revealed = false; renderDetail(); $('#detail-content').scrollTop = 0; focusStudy('#detail-device'); return; }
+      const tab = event.target.closest('[data-tab]');
+      if (tab) {
+        state.tab = tab.dataset.tab; state.memberFilter = ''; state.expiryOnly = false; state.filter = '全部成员'; $('#search').value = '';
+        document.querySelectorAll('[data-tab]').forEach(button => { button.classList.toggle('active',button === tab); if (button === tab) button.setAttribute('aria-current','page'); else button.removeAttribute('aria-current'); }); renderHome(); return;
+      }
+      const member = event.target.closest('[data-member], [data-category]');
+      if (member) { state.memberFilter = member.dataset.member || member.dataset.category; renderHome(); return; }
+      const type = event.target.closest('[data-type]'); if (type) { state.type = type.dataset.type; renderEntry(); return; }
+      const owner = event.target.closest('[data-owner]'); if (owner) { state.owner = owner.dataset.owner; renderEntry(); return; }
+      const setting = event.target.closest('[data-setting]');
+      if (setting) { const name = setting.dataset.setting; sheet($('#home-device'), name, `<p>${name === '数据与备份' ? '正式页面在这里直接提供加密导出与覆盖恢复，并展示备份状态。此样张仅演示视觉，不操作文件。' : '此处展示设置入口的视觉层级；具体安全设置保留现有应用行为。'}</p>`); return; }
+      const action = event.target.closest('[data-action]')?.dataset.action;
+      if (!action) return;
+      if (action === 'new-entry') newEntry();
+      if (action === 'expiry') { state.expiryOnly = true; renderHome(); }
+      if (action === 'clear-filter') { state.memberFilter = ''; state.expiryOnly = false; state.filter = '全部成员'; $('#search').value = ''; renderHome(); }
+      if (action === 'reveal') { state.revealed = !state.revealed; renderDetail(); }
+      if (action === 'copy-number') sheet($('#detail-device'),'复制号码','<p>此处只演示确认交互。样张中的号码为虚构内容，不写入系统剪贴板。</p>','模拟复制',() => toast($('#detail-device'),'已完成复制演示，未写入剪贴板'));
+      if (action === 'copy-field') toast($('#detail-device'),'已完成字段复制演示，未写入剪贴板');
+      if (action === 'attachment') sheet($('#detail-device'),'附件预览','<p>这是附件入口示意，没有关联真实证件或文件。</p>');
+      if (action === 'entry-attachment') sheet($('#entry-device'),'添加附件','<p>正式页面支持图片与文件。此样张不打开文件选择器，也不读取本机文件。</p>');
+      if (action === 'back-home') focusStudy('#home-device');
+      if (action === 'edit') {
+        const record = records.find(r => r.id === state.selected);
+        const open = () => { state.editing = true; state.type = ({id:'身份证',bank:'银行卡',insurance:'保险单',address:'收货地址'})[record.id] || '身份证'; state.owner = record.owner; state.step = 2; state.draft = {name:record.owner,number:'000000000000000000',start:'2014-06-18',end:'2034-06-18',address:'海棠路 18 号',note:''}; state.dirty = false; renderEntry(); focusStudy('#entry-device'); };
+        if (state.dirty) sheet($('#entry-device'),'放弃未保存的内容？','<p>继续编辑将清空当前演示输入。</p>','放弃并编辑',open); else open();
+      }
+      if (action === 'entry-back') { if (state.step > 0) { state.step--; renderEntry(); $('#entry-form').scrollTop = 0; } else focusStudy('#home-device'); }
+      if (action === 'entry-close') {
+        const exit = () => { state.dirty = false; state.step = 0; state.editing = false; state.draft = {name:'',number:'',start:'',end:'',address:'',note:''}; renderEntry(); focusStudy('#home-device'); };
+        if (state.dirty) sheet($('#entry-device'),'放弃这次填写？','<p>已填写的演示内容尚未保存，退出后会清空。</p>','放弃填写',exit); else exit();
+      }
+    });
+    $('#entry-form').addEventListener('input', event => { if (event.target.name) { state.draft[event.target.name] = event.target.value; state.dirty = true; event.target.classList.remove('invalid'); event.target.removeAttribute('aria-invalid'); event.target.closest('label')?.querySelector('.form-error')?.remove(); } });
+    $('#entry-form').addEventListener('submit', event => {
+      event.preventDefault();
+      if (state.step === 2) {
+        $('#entry-form').querySelectorAll('.form-error').forEach(node => node.remove());
+        const required = state.type === '收货地址' ? ['name','address'] : ['name','number']; let first;
+        for (const key of required) {
+          const input = $('#entry-form').elements.namedItem(key);
+          if (!String(state.draft[key] || '').trim()) { input.classList.add('invalid'); input.setAttribute('aria-invalid','true'); const error = document.createElement('p'); error.className = 'form-error'; error.textContent = '请填写此项'; error.setAttribute('role','alert'); input.after(error); first ||= input; }
+        }
+        if (first) { first.focus(); return; }
+      }
+      if (state.step < 3) { state.step++; renderEntry(); $('#entry-form').scrollTop = 0; }
+      else sheet($('#entry-device'),'资料已整理好','<p>保存交互演示完成。此样张不会将输入写入应用、磁盘或浏览器存储，刷新即可还原。</p>','完成',() => { state.dirty = false; toast($('#entry-device'),'演示完成'); });
+    });
+    $('#search').addEventListener('input', () => { if (state.tab !== 'home' && !state.memberFilter) { state.memberFilter = ''; state.tab = 'home'; document.querySelectorAll('[data-tab]').forEach(button => { const active = button.dataset.tab === 'home'; button.classList.toggle('active',active); if (active) button.setAttribute('aria-current','page'); else button.removeAttribute('aria-current'); }); } renderHome(); });
+    document.addEventListener('change', event => { if (event.target.id === 'member-filter') { state.filter = event.target.value; renderHome(); } });
+    $('#scenario').addEventListener('change', event => { state.scenario = event.target.value; state.revealed = false; state.memberFilter = ''; state.expiryOnly = false; state.filter = '全部成员'; $('#search').value = ''; renderHome(); renderDetail(); });
+    $('#theme-toggle').addEventListener('click', event => { const dark = document.documentElement.dataset.theme !== 'dark'; document.documentElement.dataset.theme = dark ? 'dark' : 'light'; event.currentTarget.setAttribute('aria-pressed',String(dark)); });
+    $('#font-scale').addEventListener('change', event => {
+      document.documentElement.dataset.large = String(Number(event.target.value) > 1);
+      document.documentElement.style.setProperty('--type-scale',event.target.value);
+    });
+    $('#preview-settings-toggle').addEventListener('click', event => {
+      const open = document.documentElement.dataset.configOpen !== 'true';
+      document.documentElement.dataset.configOpen = String(open); event.currentTarget.setAttribute('aria-expanded',String(open));
+      event.currentTarget.textContent = open ? '收起设置' : '预览设置';
+    });
+    document.querySelectorAll('button[data-palette]').forEach(button => button.addEventListener('click', () => {
+      document.documentElement.dataset.palette = button.dataset.palette;
+      document.querySelectorAll('button[data-palette]').forEach(node => node.setAttribute('aria-pressed',String(node === button)));
+    }));
+    $('#view-mode').addEventListener('change', event => { document.documentElement.dataset.view = event.target.value; });
+    $('#screen-picker').addEventListener('change', event => selectScreen(event.target.value));
+    $('#width').addEventListener('change', event => {
+      document.documentElement.style.setProperty('--screen-width',event.target.value === 'auto' ? '100vw' : `${Number(event.target.value)}px`);
+    });
+    $('#height').addEventListener('change', event => { document.documentElement.style.setProperty('--screen-height',`${Number(event.target.value)}px`); });
+    document.addEventListener('visibilitychange', () => { if (document.hidden && state.revealed) { state.revealed = false; renderDetail(); } });
+    hydrateIcons(); renderHome(); renderDetail(); renderEntry();
+    const sizeObserver = new ResizeObserver(entries => entries.forEach(({target,contentRect}) => {
+      const name = target.closest('.study').dataset.screen;
+      if (contentRect.width > 0) $(`[data-size="${name}"]`).textContent = `${Math.round(contentRect.width)} × ${Math.round(contentRect.height)}`;
+    }));
+    document.querySelectorAll('.device > .app').forEach(node => sizeObserver.observe(node));
+    if (matchMedia('(max-width: 680px), (max-height: 600px)').matches) {
+      document.documentElement.dataset.view = 'single'; $('#view-mode').value = 'single';
+      $('#width').value = 'auto'; document.documentElement.style.setProperty('--screen-width','100vw');
+    }
+  </script>
+</body>
+</html>

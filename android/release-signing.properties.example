@@ -1,0 +1,5 @@
+# Copy this file to android/release-signing.properties and use absolute paths.
+# Never commit the real properties file, keystore, or password file.
+storeFile=/absolute/path/to/anch-release.p12
+passwordFile=/absolute/path/to/anch-release.pass
+keyAlias=anch-release

@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>安册 · 白瓷档案 UI Demo</title>
+<style>
+  :root{
+    color-scheme:light;
+    --workbench:#e9eeec;
+    --canvas:#f4f6f4;
+    --surface:#ffffff;
+    --surface-2:#eef2f0;
+    --ink:#18211f;
+    --ink-2:#52615d;
+    --ink-3:#73807c;
+    --line:#d5ddda;
+    --line-strong:#aebbb7;
+    --primary:#527d78;
+    --primary-deep:#345b57;
+    --primary-soft:#dfeae7;
+    --primary-wash:#edf3f1;
+    --danger:#9e4e50;
+    --danger-soft:#f4e7e6;
+    --warning:#8a6824;
+    --warning-soft:#f4ecd8;
+    --success:#3d7253;
+    --shadow:0 28px 80px rgba(29,46,41,.14);
+    --phone-w:390px;
+    --phone-h:844px;
+    --r-sm:8px;
+    --r-md:12px;
+    --r-lg:18px;
+    --ease:cubic-bezier(.22,.8,.22,1);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  }
+  body.dark{
+    color-scheme:dark;
+    --workbench:#0d1211;
+    --canvas:#141a18;
+    --surface:#1c2422;
+    --surface-2:#242e2b;
+    --ink:#edf2f0;
+    --ink-2:#bdc8c4;
+    --ink-3:#8f9b97;
+    --line:#34403d;
+    --line-strong:#5b6a66;
+    --primary:#93b7b1;
+    --primary-deep:#cae2de;
+    --primary-soft:#29413d;
+    --primary-wash:#1e302d;
+    --danger:#e39a9d;
+    --danger-soft:#452c2d;
+    --warning:#d5b267;
+    --warning-soft:#453a20;
+    --success:#84bd96;
+    --shadow:none;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--workbench);color:var(--ink)}
+  button,input{font:inherit}
+  button{color:inherit}
+  .icon{width:1em;height:1em;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .review-bar{
+    position:sticky;top:0;z-index:50;min-height:66px;padding:10px 22px;
+    display:flex;align-items:center;gap:18px;border-bottom:1px solid var(--line);
+    background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px)
+  }
+  .review-brand{min-width:max-content}
+  .review-brand b{display:block;font-size:15px}
+  .review-brand span{display:block;margin-top:2px;color:var(--ink-3);font-size:11px}
+  .review-tabs{display:flex;gap:4px;overflow:auto;scrollbar-width:none}
+  .review-tabs::-webkit-scrollbar{display:none}
+  .review-tab,.mode-toggle{
+    height:38px;padding:0 12px;border:1px solid transparent;border-radius:8px;background:transparent;
+    color:var(--ink-2);cursor:pointer;font-size:12px;font-weight:650;white-space:nowrap
+  }
+  .review-tab.active{border-color:var(--line);background:var(--surface);color:var(--primary-deep)}
+  .mode-toggle{margin-left:auto;border-color:var(--line);background:var(--surface)}
+  .review-layout{
+    width:min(1120px,100%);margin:auto;padding:28px;display:grid;
+    grid-template-columns:minmax(430px,1fr) 320px;gap:34px;align-items:start
+  }
+  .phone-stage{min-height:calc(var(--phone-h) + 30px);display:grid;place-items:start center}
+  .phone{
+    width:var(--phone-w);height:var(--phone-h);position:relative;overflow:hidden;
+    border:1px solid color-mix(in srgb,var(--line-strong) 68%,transparent);
+    border-radius:32px;background:var(--canvas);box-shadow:var(--shadow)
+  }
+  .statusbar{
+    height:30px;padding:7px 18px 0;display:flex;justify-content:space-between;align-items:flex-start;
+    font-size:11px;font-weight:700;letter-spacing:.01em
+  }
+  .status-icons{display:flex;align-items:center;gap:5px;color:var(--ink)}
+  .status-icons .icon{width:14px;height:14px}
+  .app{
+    height:calc(100% - 30px);position:relative;overflow:hidden;background:var(--canvas)
+  }
+  .page{
+    position:absolute;inset:0;display:none;flex-direction:column;background:var(--canvas);
+    animation:pageIn .24s var(--ease)
+  }
+  .page.active{display:flex}
+  @keyframes pageIn{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .scroll{flex:1;min-height:0;overflow:auto;padding:0 20px 108px;scrollbar-width:none}
+  .scroll::-webkit-scrollbar{display:none}
+  .page.no-nav .scroll{padding-bottom:96px}
+  .hero{padding:28px 0 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+  .hero h1{margin:0;font-size:30px;line-height:1.15;letter-spacing:-.035em;font-weight:680}
+  .hero p{margin:7px 0 0;color:var(--ink-3);font-size:13px;line-height:1.6}
+  .round-action,.top-action{
+    width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);
+    border-radius:50%;background:var(--surface);cursor:pointer
+  }
+  .round-action .icon,.top-action .icon{width:21px;height:21px}
+  .search{
+    height:52px;padding:0 15px;display:flex;align-items:center;gap:11px;
+    border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);color:var(--ink-3)
+  }
+  .search .icon{width:21px;height:21px}
+  .search input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-size:14px}
+  .search input::placeholder{color:var(--ink-3)}
+  .section-head{
+    margin:27px 0 11px;display:flex;align-items:center;gap:9px
+  }
+  .index-line{width:3px;height:17px;border-radius:2px;background:var(--primary)}
+  .section-head h2{margin:0;font-size:15px;line-height:1.3;font-weight:680;letter-spacing:.01em}
+  .section-head .count{margin-left:auto;color:var(--primary-deep);font-size:13px;font-weight:650}
+  .attention{
+    min-height:86px;padding:15px 15px 15px 13px;display:grid;grid-template-columns:42px 1fr 24px;align-items:center;gap:12px;
+    border:1px solid color-mix(in srgb,var(--danger) 22%,var(--line));border-left:3px solid var(--danger);
+    border-radius:12px;background:color-mix(in srgb,var(--danger-soft) 55%,var(--surface))
+  }
+  .attention-mark{
+    width:40px;height:40px;display:grid;place-items:center;border-radius:10px;
+    background:var(--surface);color:var(--danger)
+  }
+  .attention-mark .icon{width:22px;height:22px}
+  .attention b{display:block;font-size:15px;line-height:1.4}
+  .attention p{margin:4px 0 0;color:var(--ink-2);font-size:12px}
+  .chev{color:var(--ink-3)}
+  .chev .icon{width:19px;height:19px}
+  .record-sheet{
+    overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:var(--surface)
+  }
+  .record-row{
+    min-height:76px;padding:12px 3px;display:grid;grid-template-columns:42px minmax(0,1fr) auto;
+    align-items:center;gap:12px;border-bottom:1px solid var(--line);cursor:pointer
+  }
+  .record-row:last-child{border-bottom:0}
+  .record-row:active{background:var(--primary-wash)}
+  .record-icon{
+    width:38px;height:38px;display:grid;place-items:center;border-radius:10px;
+    background:var(--primary-wash);color:var(--primary-deep)
+  }
+  .record-icon .icon{width:22px;height:22px}
+  .record-main{min-width:0}
+  .record-title-line{display:flex;align-items:center;gap:7px}
+  .record-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;font-weight:650}
+  .pin-note{color:var(--primary);font-size:10px;font-weight:700}
+  .record-meta{margin-top:5px;color:var(--ink-3);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .record-dates{margin-top:6px;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:650}
+  .record-dates span{padding-right:8px;border-right:1px solid var(--line)}
+  .record-dates span:last-child{border:0}
+  .record-dates .due{color:var(--danger)}
+  .row-tail{display:flex;align-items:center;gap:8px;color:var(--ink-3)}
+  .row-tail .icon{width:18px;height:18px}
+  .fab{
+    position:absolute;right:18px;bottom:79px;width:54px;height:54px;z-index:6;
+    display:grid;place-items:center;border:0;border-radius:16px;background:var(--primary);
+    color:white;box-shadow:0 10px 26px rgba(44,78,72,.24);cursor:pointer
+  }
+  body.dark .fab{color:#15211f;box-shadow:none}
+  .fab .icon{width:24px;height:24px;stroke-width:2}
+  .bottom-nav{
+    position:absolute;left:0;right:0;bottom:0;height:70px;padding:5px 7px max(7px,env(safe-area-inset-bottom));
+    display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);
+    background:color-mix(in srgb,var(--surface) 96%,transparent);z-index:5
+  }
+  .nav-item{
+    position:relative;border:0;background:transparent;color:var(--ink-3);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px
+  }
+  .nav-item .icon{width:21px;height:21px}
+  .nav-item.active{color:var(--primary-deep);font-weight:700}
+  .nav-item.active::before{
+    content:"";position:absolute;top:0;width:22px;height:2px;border-radius:2px;background:var(--primary)
+  }
+  .member-sheet{
+    overflow:hidden;border:1px solid var(--line);border-radius:14px;background:var(--surface)
+  }
+  .member-row{
+    min-height:78px;padding:12px 15px;display:grid;grid-template-columns:42px 1fr 20px;
+    align-items:center;gap:13px;border-bottom:1px solid var(--line)
+  }
+  .member-row:last-child{border-bottom:0}
+  .avatar{
+    width:40px;height:40px;display:grid;place-items:center;border-radius:50%;
+    background:var(--surface-2);color:var(--primary-deep);font-size:14px;font-weight:750
+  }
+  .avatar.family{background:var(--primary-soft)}
+  .member-row b{display:block;font-size:15px}
+  .member-row span{display:block;margin-top:4px;color:var(--ink-3);font-size:12px}
+  .add-member{color:var(--primary-deep)}
+  .category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .category-card{
+    min-height:104px;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--surface);
+    display:flex;flex-direction:column;cursor:pointer;position:relative;overflow:hidden
+  }
+  .category-card::before{
+    content:"";position:absolute;left:0;top:14px;width:2px;height:26px;background:var(--primary)
+  }
+  .category-top{display:flex;align-items:center;justify-content:space-between;color:var(--ink-3);font-size:11px}
+  .category-top .icon{width:20px;height:20px;color:var(--primary-deep)}
+  .category-card b{margin-top:auto;font-size:15px;line-height:1.25}
+  .category-card small{margin-top:4px;color:var(--ink-3);font-size:11px}
+  .privacy-note{
+    padding:17px 16px 16px;border:1px solid var(--primary);border-left:3px solid var(--primary);
+    border-radius:12px;background:var(--primary-wash)
+  }
+  .privacy-title{display:flex;align-items:center;gap:10px;color:var(--primary-deep);font-size:16px;font-weight:700}
+  .privacy-title .icon{width:22px;height:22px}
+  .privacy-note ul{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
+  .privacy-note li{display:flex;gap:9px;color:var(--ink-2);font-size:12px;line-height:1.5}
+  .privacy-note li .icon{width:16px;height:16px;margin-top:1px;color:var(--primary)}
+  .settings-sheet{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+  .settings-row{
+    min-height:65px;padding:10px 3px;display:grid;grid-template-columns:30px 1fr auto;
+    align-items:center;gap:11px;border-bottom:1px solid var(--line)
+  }
+  .settings-row:last-child{border-bottom:0}
+  .settings-row>.icon{width:20px;height:20px;color:var(--ink-2)}
+  .settings-row b{display:block;font-size:14px}
+  .settings-row small{display:block;margin-top:3px;color:var(--ink-3);font-size:11px;line-height:1.4}
+  .settings-value{color:var(--primary-deep);font-size:12px;font-weight:650}
+  .topbar{
+    min-height:58px;padding:4px 12px;display:grid;grid-template-columns:48px 1fr 96px;align-items:center
+  }
+  .topbar h1{margin:0;text-align:center;font-size:16px;font-weight:700}
+  .topbar-actions{display:flex;justify-content:flex-end;gap:2px}
+  .top-icon{
+    width:44px;height:44px;border:0;border-radius:10px;background:transparent;display:grid;place-items:center;cursor:pointer
+  }
+  .top-icon .icon{width:22px;height:22px}
+  .detail-hero{padding:24px 0 22px;border-bottom:1px solid var(--line)}
+  .detail-hero .eyebrow{color:var(--primary);font-size:11px;font-weight:750;letter-spacing:.1em}
+  .detail-hero h2{margin:8px 0 7px;font-size:27px;line-height:1.22;letter-spacing:-.03em}
+  .detail-hero p{margin:0;color:var(--ink-3);font-size:12px}
+  .attachment-row{
+    min-height:62px;padding:12px 0;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)
+  }
+  .attachment-thumb{
+    width:38px;height:38px;display:grid;place-items:center;border:1px dashed var(--line-strong);
+    border-radius:9px;color:var(--ink-2)
+  }
+  .attachment-thumb .icon{width:19px;height:19px}
+  .attachment-row b{font-size:13px}
+  .attachment-row span{margin-left:auto;color:var(--ink-3);font-size:11px}
+  .sensitive{
+    margin-top:20px;padding:16px;border:1px solid var(--line-strong);border-radius:14px;
+    background:var(--primary-wash)
+  }
+  .sensitive-label{display:flex;align-items:center;gap:7px;color:var(--primary-deep);font-size:12px;font-weight:700}
+  .sensitive-label .icon{width:15px;height:15px}
+  .secret-number{
+    margin:19px 0 16px;font-variant-numeric:tabular-nums;letter-spacing:.08em;font-size:25px;font-weight:650;
+    white-space:nowrap
+  }
+  .secret-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .secondary-btn,.primary-btn{
+    height:44px;border-radius:9px;display:flex;align-items:center;justify-content:center;gap:7px;
+    font-size:13px;font-weight:700;cursor:pointer
+  }
+  .secondary-btn{border:1px solid var(--line);background:var(--surface)}
+  .primary-btn{border:1px solid var(--primary);background:var(--primary);color:white}
+  body.dark .primary-btn{color:#13201e}
+  .secondary-btn .icon,.primary-btn .icon{width:17px;height:17px}
+  .field-section{margin-top:27px}
+  .field-section-title{margin-bottom:6px;display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700}
+  .field-list{border-top:1px solid var(--line)}
+  .field-row{
+    min-height:61px;padding:10px 0;display:grid;grid-template-columns:82px 1fr auto;align-items:center;gap:10px;
+    border-bottom:1px solid var(--line)
+  }
+  .field-row .label{color:var(--ink-3);font-size:12px}
+  .field-row .value{font-size:14px;font-weight:600}
+  .mini-copy{
+    width:38px;height:38px;border:0;background:transparent;color:var(--ink-3);display:grid;place-items:center
+  }
+  .mini-copy .icon{width:18px;height:18px}
+  .edit-progress{padding:2px 20px 18px}
+  .edit-progress-head{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+  .edit-progress-head b{font-size:14px}
+  .steps{margin-top:9px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .step{height:3px;border-radius:3px;background:var(--line)}
+  .step.done{background:var(--primary)}
+  .form-section{margin-top:24px}
+  .form-section:first-child{margin-top:8px}
+  .form-title{margin-bottom:14px;display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700}
+  .form-field{margin-bottom:18px}
+  .form-field label{display:block;margin-bottom:7px;color:var(--ink-2);font-size:12px;font-weight:600}
+  .form-field .required{color:var(--danger)}
+  .form-control{
+    width:100%;height:50px;padding:0 13px;border:1px solid var(--line-strong);border-radius:9px;
+    outline:0;background:var(--surface);color:var(--ink);font-size:14px
+  }
+  .form-control:focus{border:2px solid var(--primary)}
+  .form-help{margin-top:5px;color:var(--ink-3);font-size:10px}
+  .edit-actions{
+    position:absolute;left:0;right:0;bottom:0;padding:12px 20px max(14px,env(safe-area-inset-bottom));
+    border-top:1px solid var(--line);background:var(--surface)
+  }
+  .wide-primary{
+    width:100%;height:50px;border:0;border-radius:11px;background:var(--primary);color:white;
+    font-size:15px;font-weight:700;cursor:pointer
+  }
+  body.dark .wide-primary{color:#13201e}
+  .toast{
+    position:absolute;left:50%;bottom:88px;z-index:20;transform:translate(-50%,12px);
+    padding:9px 13px;border-radius:8px;background:var(--ink);color:var(--surface);
+    font-size:11px;opacity:0;pointer-events:none;transition:.22s var(--ease);white-space:nowrap
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .review-notes{
+    position:sticky;top:94px;padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--surface)
+  }
+  .review-notes .kicker{color:var(--primary);font-size:11px;font-weight:800;letter-spacing:.12em}
+  .review-notes h2{margin:8px 0 10px;font-size:22px;line-height:1.25}
+  .review-notes p{margin:0;color:var(--ink-2);font-size:13px;line-height:1.75}
+  .review-notes ol{margin:20px 0 0;padding:0;list-style:none;counter-reset:n;display:grid;gap:15px}
+  .review-notes li{counter-increment:n;display:grid;grid-template-columns:25px 1fr;gap:9px;color:var(--ink-2);font-size:12px;line-height:1.6}
+  .review-notes li::before{
+    content:counter(n);width:23px;height:23px;display:grid;place-items:center;border-radius:7px;
+    background:var(--primary-soft);color:var(--primary-deep);font-size:10px;font-weight:800
+  }
+  .swatches{margin-top:20px;display:flex;gap:7px}
+  .swatches i{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--c)}
+  @media(max-width:800px){
+    .review-bar{padding:9px 10px;gap:8px}
+    .review-brand{display:none}
+    .mode-toggle{margin-left:0}
+    .review-layout{padding:0;display:block}
+    .review-notes{display:none}
+    .phone-stage{min-height:0}
+    .phone{width:100%;height:calc(100dvh - 57px);border:0;border-radius:0;box-shadow:none}
+  }
+
+
+  /* ===== V2 · Porcelain Archive overrides ===== */
+  :root{
+    --workbench:#e8ecea;
+    --canvas:#fdfefd;
+    --surface:#ffffff;
+    --surface-2:#f3f6f5;
+    --ink:#171d1b;
+    --ink-2:#4f5c58;
+    --ink-3:#79837f;
+    --line:#dce2df;
+    --line-strong:#aab7b3;
+    --primary:#557d78;
+    --primary-deep:#365e59;
+    --primary-soft:#dfeae7;
+    --primary-wash:#f0f5f3;
+    --danger:#9d4f52;
+    --danger-soft:#f5e9e8;
+  }
+  body.dark{
+    --canvas:#151a18;
+    --surface:#1c2321;
+    --surface-2:#232c29;
+    --ink:#f0f4f2;
+    --ink-2:#bdc7c3;
+    --ink-3:#8c9793;
+    --line:#343e3b;
+    --line-strong:#5f6c68;
+    --primary:#9abdb7;
+    --primary-deep:#d6e8e4;
+    --primary-soft:#29403c;
+    --primary-wash:#1d2d2a;
+  }
+  .phone,.app,.page{background:var(--canvas)}
+  .hero h1{font-size:31px;letter-spacing:-.04em}
+  .search{height:50px;border-radius:10px;background:var(--surface)}
+  .section-head{gap:10px}
+  .index-line{
+    width:9px;height:19px;border-radius:0;background:none;position:relative;display:block;flex:0 0 auto
+  }
+  .index-line::before,.index-line::after{
+    content:"";position:absolute;bottom:0;border-radius:2px;background:var(--primary)
+  }
+  .index-line::before{left:0;width:3px;height:19px}
+  .index-line::after{right:0;width:2px;height:12px}
+  .attention{
+    min-height:78px;padding:14px 14px 14px 16px;grid-template-columns:1fr 22px;
+    border:1px solid var(--line);border-left:3px solid var(--danger);border-radius:9px;background:var(--surface)
+  }
+  .attention-mark{display:none}
+  .attention b{font-size:15px}
+  .attention p{font-size:11px}
+  .record-spotlight{
+    padding:16px 15px 15px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:var(--surface);cursor:pointer
+  }
+  .spot-top{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:11px}
+  .spot-icon{
+    width:36px;height:36px;display:grid;place-items:center;border-radius:9px;background:var(--primary-wash);color:var(--primary-deep)
+  }
+  .spot-icon .icon{width:20px;height:20px}
+  .spot-copy b{display:block;font-size:16px}
+  .spot-copy span{display:block;margin-top:5px;color:var(--ink-3);font-size:11px}
+  .spot-top em{font-style:normal;color:var(--ink-3);font-size:12px;letter-spacing:.12em}
+  .spot-dates{margin-top:15px;padding-top:14px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr}
+  .spot-dates>div{display:grid;grid-template-columns:auto 1fr;align-items:end;gap:8px}
+  .spot-dates>div+div{padding-left:16px;border-left:1px solid var(--line)}
+  .spot-dates strong{font-size:27px;line-height:1;font-weight:650;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+  .spot-dates span{padding-bottom:2px;color:var(--ink-3);font-size:10px}
+  .spot-dates .danger strong,.spot-dates .danger span{color:var(--danger)}
+  .record-sheet{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent}
+  .record-row{min-height:69px;padding:10px 1px;grid-template-columns:32px 1fr auto;gap:11px}
+  .record-icon{width:30px;height:30px;border-radius:0;background:transparent;color:var(--ink-2)}
+  .record-icon .icon{width:21px;height:21px}
+  .record-title{font-size:14px}
+  .record-meta{font-size:11px}
+  .record-dates{display:none}
+  .pin-note{font-size:9px}
+  .member-sheet{border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+  .member-row{min-height:74px;padding:10px 1px;grid-template-columns:38px 1fr 18px}
+  .avatar{width:35px;height:35px;border:1px solid var(--line);background:var(--surface);font-size:11px}
+  .avatar.family{background:var(--primary-wash);border-color:var(--primary-soft)}
+  .category-grid{
+    gap:0;counter-reset:category;border-top:1px solid var(--line);border-left:1px solid var(--line)
+  }
+  .category-card{
+    counter-increment:category;min-height:112px;padding:14px;border:0;border-right:1px solid var(--line);
+    border-bottom:1px solid var(--line);border-radius:0;background:var(--surface);display:block
+  }
+  .category-card::before{
+    content:counter(category,decimal-leading-zero);position:absolute;left:14px;top:13px;width:auto;height:auto;background:none;
+    color:var(--ink-3);font-size:9px;font-weight:800;letter-spacing:.12em
+  }
+  .category-card .solar-icon,.category-card>.icon{position:absolute;right:13px;top:13px}
+  .category-card b{display:block;margin-top:42px;font-size:15px}
+  .category-card small{font-size:10px}
+  .privacy-note{
+    border:0;border-top:1px solid var(--primary);border-bottom:1px solid var(--primary);border-radius:0;background:var(--primary-wash)
+  }
+  .settings-sheet{border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent}
+  .settings-row{padding-left:1px;padding-right:1px}
+  .sensitive{
+    padding:0;overflow:hidden;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);
+    box-shadow:0 10px 26px rgba(31,48,43,.08)
+  }
+  body.dark .sensitive{box-shadow:none}
+  .sensitive-label{
+    min-height:44px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--primary-wash);gap:9px
+  }
+  .sensitive-label small{margin-left:auto;color:var(--ink-3);font-size:9px;font-weight:650;letter-spacing:.05em}
+  .mini-spine{width:9px;height:17px;display:grid;grid-template-columns:3px 2px;gap:3px;align-items:end}
+  .mini-spine i{display:block;border-radius:2px;background:var(--primary)}
+  .mini-spine i:first-child{height:17px}.mini-spine i:last-child{height:11px}
+  .secret-number{margin:0;padding:24px 16px 20px;font-size:24px}
+  .secret-actions{gap:0;border-top:1px solid var(--line)}
+  .secondary-btn,.primary-btn{height:46px;border:0;border-radius:0}
+  .primary-btn{border-left:1px solid var(--line)}
+  .field-row{grid-template-columns:84px 1fr auto}
+  .choice-grid{gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  .choice-card{border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;background:var(--surface)}
+  .choice-card.selected{border:0;border-right:2px solid var(--primary);background:var(--primary-wash)}
+  .form-control,.input{border-radius:8px;background:var(--surface)}
+  .fab{border-radius:15px}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/><circle cx="8" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18" r="1.4" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4.5l3 1.7M8 3.5 5.5 6M16 3.5 18.5 6"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="m3 9 9-5 9 5M5 10h14M6 19h12M7 11v6M12 11v6M17 11v6"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M7 15h4"/></symbol>
+  <symbol id="i-id" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M5.5 16c.7-1.7 4.3-1.7 5 0M13 10h5M13 14h5"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-7 9 7M5.5 10.5V20h13v-9.5M9.5 20v-6h5v6"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><path d="M3.5 20c.7-4.5 10.3-4.5 11 0M16 7.5a3 3 0 0 1 0 5.8M16 15.5c2.4.2 4 1.5 4.5 4.5"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10H3z"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5.5 20c.8-5.2 12.2-5.2 13 0"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="4" width="11" height="14" rx="2"/><path d="M16 20H6a2 2 0 0 1-2-2V8"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="m4 20 4.5-1 10-10-3.5-3.5-10 10zM13.5 7l3.5 3.5"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M10 18.5h4"/></symbol>
+  <symbol id="i-offline" viewBox="0 0 24 24"><path d="M5 9.5A10 10 0 0 1 18.5 8M8 13a6 6 0 0 1 7.4-.8M11 16.5a2 2 0 0 1 2 0M3 3l18 18"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.8 2.8 8.2 7 10 4.2-1.8 7-5.2 7-10V6z"/></symbol>
+  <symbol id="i-passport" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="11" r="3"/><path d="M9 16h6"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="m5 10 2-4h10l2 4M4 10h16v7H4zM7 17v2M17 17v2"/><circle cx="7.5" cy="13.5" r="1"/><circle cx="16.5" cy="13.5" r="1"/></symbol>
+  <symbol id="i-baby" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M9 11h.01M15 11h.01M9.5 15c1.5 1.2 3.5 1.2 5 0M12 5c0-2 2-2.5 3-1.5"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20 8c0 5-8 11-8 11S4 13 4 8c0-4 5-5 8-1 3-4 8-3 8 1Z"/></symbol>
+  <symbol id="i-graduate" viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5zM7 12v4c3 2 7 2 10 0v-4M21 9v6"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M4 21V8l8-4 8 4v13M2 21h20M8 10h2M14 10h2M8 14h2M14 14h2M10 21v-3h4v3"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="m5 18 5-5 3 3 2-2 4 4"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M3 8c5-4 13-4 18 0M6 12c3.5-2.8 8.5-2.8 12 0M9.5 16c1.5-1.2 3.5-1.2 5 0"/><circle cx="12" cy="19" r=".8" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="3" y="7" width="17" height="10" rx="2"/><path d="M22 10v4M6 10h8v4H6z" fill="currentColor" stroke="none"/></symbol>
+</svg>
+
+<header class="review-bar">
+  <div class="review-brand"><b>安册 · 白瓷档案</b><span>PORCELAIN ARCHIVE / V2 DEMO</span></div>
+  <nav class="review-tabs">
+    <button class="review-tab active" data-open="home">首页</button>
+    <button class="review-tab" data-open="members">成员</button>
+    <button class="review-tab" data-open="categories">分类</button>
+    <button class="review-tab" data-open="settings">我的</button>
+    <button class="review-tab" data-open="detail">资料详情</button>
+    <button class="review-tab" data-open="edit">编辑表单</button>
+  </nav>
+  <button class="mode-toggle" id="modeToggle">暗色</button>
+</header>
+
+<main class="review-layout">
+  <section class="phone-stage">
+    <div class="phone">
+      <div class="statusbar">
+        <span>09:41</span>
+        <span class="status-icons">
+          <svg class="icon"><use href="#i-wifi"/></svg>
+          <span>5G</span>
+          <svg class="icon"><use href="#i-battery"/></svg>
+          <span>86%</span>
+        </span>
+      </div>
+      <div class="app">
+        <section class="page active" data-page="home">
+          <div class="scroll">
+            <header class="hero">
+              <div><h1>安册</h1><p>家庭重要资料，本地整理</p></div>
+              <button class="round-action" aria-label="筛选"><svg class="icon"><use href="#i-filter"/></svg></button>
+            </header>
+            <label class="search">
+              <svg class="icon"><use href="#i-search"/></svg>
+              <input placeholder="搜索资料、成员或备注">
+            </label>
+            <div class="section-head"><i class="index-line"></i><h2>近期事项</h2></div>
+            <button class="attention" style="width:100%;text-align:left;color:inherit;cursor:pointer">
+              <span class="attention-mark"><svg class="icon"><use href="#i-clock"/></svg></span>
+              <span><b>4 份资料需要关注</b><p>2 份已过期 · 2 份将在 30 天内到期</p></span>
+              <span class="chev"><svg class="icon"><use href="#i-chevron"/></svg></span>
+            </button>
+            <div class="section-head"><i class="index-line"></i><h2>重点资料</h2></div>
+            <article class="record-spotlight" data-go="detail">
+              <div class="spot-top">
+                <span class="spot-icon"><svg class="icon"><use href="#i-bank"/></svg></span>
+                <div class="spot-copy"><b>差旅测试卡</b><span>林安 · 远山测试银行 · 银联</span></div>
+                <em>0014</em>
+              </div>
+              <div class="spot-dates">
+                <div><strong>08</strong><span>每月账单日</span></div>
+                <div class="danger"><strong>26</strong><span>每月还款日</span></div>
+              </div>
+            </article>
+            <div class="section-head"><i class="index-line"></i><h2>全部资料</h2><span class="count">25 份</span></div>
+            <div class="record-sheet">
+              <div class="record-row">
+                <span class="record-icon"><svg class="icon"><use href="#i-bank"/></svg></span>
+                <div class="record-main"><div class="record-title-line"><span class="record-title">家庭备用卡 1（0013）</span><span class="pin-note">置顶</span></div><div class="record-meta">周晴 · 朝霞测试银行 · 家庭备用</div></div>
+                <span class="row-tail"><svg class="icon"><use href="#i-chevron"/></svg></span>
+              </div>
+              <div class="record-row">
+                <span class="record-icon"><svg class="icon"><use href="#i-card"/></svg></span>
+                <div class="record-main"><div class="record-title-line"><span class="record-title">林安的身份证</span></div><div class="record-meta">我 · 身份证</div></div>
+                <span class="row-tail"><svg class="icon"><use href="#i-chevron"/></svg></span>
+              </div>
+              <div class="record-row">
+                <span class="record-icon"><svg class="icon"><use href="#i-passport"/></svg></span>
+                <div class="record-main"><div class="record-title-line"><span class="record-title">周晴的护照</span></div><div class="record-meta">周晴 · 有效期至 2032 年 8 月</div></div>
+                <span class="row-tail"><svg class="icon"><use href="#i-chevron"/></svg></span>
+              </div>
+            </div>
+          </div>
+          <button class="fab" data-go="edit" aria-label="新增资料"><svg class="icon"><use href="#i-plus"/></svg></button>
+          <nav class="bottom-nav">
+            <button class="nav-item active" data-open="home"><svg class="icon"><use href="#i-home"/></svg><span>首页</span></button>
+            <button class="nav-item" data-open="members"><svg class="icon"><use href="#i-users"/></svg><span>成员</span></button>
+            <button class="nav-item" data-open="categories"><svg class="icon"><use href="#i-folder"/></svg><span>分类</span></button>
+            <button class="nav-item" data-open="settings"><svg class="icon"><use href="#i-person"/></svg><span>我的</span></button>
+          </nav>
+        </section>
+
+        <section class="page" data-page="members">
+          <div class="scroll">
+            <header class="hero"><div><h1>成员</h1><p>从家人维度整理资料</p></div></header>
+            <div class="member-sheet">
+              <div class="member-row"><span class="avatar family"><svg class="icon" style="width:20px"><use href="#i-home"/></svg></span><div><b>家庭</b><span>1 份公共资料</span></div><span class="chev"><svg class="icon"><use href="#i-chevron"/></svg></span></div>
+              <div class="member-row"><span class="avatar">我</span><div><b>林安</b><span>12 份资料</span></div><span class="chev"><svg class="icon"><use href="#i-chevron"/></svg></span></div>
+              <div class="member-row"><span class="avatar">周</span><div><b>周晴</b><span>6 份资料</span></div><span class="chev"><svg class="icon"><use href="#i-chevron"/></svg></span></div>
+              <div class="member-row"><span class="avatar">满</span><div><b>林小满</b><span>4 份资料</span></div><span class="chev"><svg class="icon"><use href="#i-chevron"/></svg></span></div>
+              <div class="member-row"><span class="avatar">山</span><div><b>林远山</b><span>2 份资料</span></div><span class="chev"><svg class="icon"><use href="#i-chevron"/></svg></span></div>
+              <div class="member-row add-member"><span class="avatar"><svg class="icon" style="width:18px"><use href="#i-plus"/></svg></span><div><b>新增家庭成员</b><span>父母、配偶、孩子或其他</span></div><span></span></div>
+            </div>
+          </div>
+          <button class="fab" aria-label="新增成员"><svg class="icon"><use href="#i-plus"/></svg></button>
+          <nav class="bottom-nav">
+            <button class="nav-item" data-open="home"><svg class="icon"><use href="#i-home"/></svg><span>首页</span></button>
+            <button class="nav-item active" data-open="members"><svg class="icon"><use href="#i-users"/></svg><span>成员</span></button>
+            <button class="nav-item" data-open="categories"><svg class="icon"><use href="#i-folder"/></svg><span>分类</span></button>
+            <button class="nav-item" data-open="settings"><svg class="icon"><use href="#i-person"/></svg><span>我的</span></button>
+          </nav>
+        </section>
+
+        <section class="page" data-page="categories">
+          <div class="scroll">
+            <header class="hero"><div><h1>分类</h1><p>按资料类型查看</p></div></header>
+            <div class="category-grid">
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-id"/></svg><span>04</span></div><b>身份证</b><small>身份与实名资料</small></div>
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-home"/></svg><span>02</span></div><b>户口本</b><small>家庭登记资料</small></div>
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-passport"/></svg><span>03</span></div><b>护照</b><small>出入境证件</small></div>
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-card"/></svg><span>02</span></div><b>银行卡</b><small>储蓄与信用卡</small></div>
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-car"/></svg><span>01</span></div><b>车辆</b><small>驾驶与行驶资料</small></div>
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-shield"/></svg><span>02</span></div><b>保险</b><small>保单与理赔资料</small></div>
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-building"/></svg><span>01</span></div><b>不动产权</b><small>房产与产权资料</small></div>
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-graduate"/></svg><span>01</span></div><b>学历 / 学位</b><small>教育证明资料</small></div>
+              <div class="category-card"><div class="category-top"><svg class="icon"><use href="#i-file"/></svg><span>04</span></div><b>其他资料</b><small>自定义归档</small></div>
+            </div>
+          </div>
+          <button class="fab" data-go="edit" aria-label="新增资料"><svg class="icon"><use href="#i-plus"/></svg></button>
+          <nav class="bottom-nav">
+            <button class="nav-item" data-open="home"><svg class="icon"><use href="#i-home"/></svg><span>首页</span></button>
+            <button class="nav-item" data-open="members"><svg class="icon"><use href="#i-users"/></svg><span>成员</span></button>
+            <button class="nav-item active" data-open="categories"><svg class="icon"><use href="#i-folder"/></svg><span>分类</span></button>
+            <button class="nav-item" data-open="settings"><svg class="icon"><use href="#i-person"/></svg><span>我的</span></button>
+          </nav>
+        </section>
+
+        <section class="page" data-page="settings">
+          <div class="scroll">
+            <header class="hero"><div><h1>设置</h1><p>本地存储 · 不联网 · 无账号</p></div></header>
+            <div class="privacy-note">
+              <div class="privacy-title"><svg class="icon"><use href="#i-phone"/></svg><span>所有资料只保存在本机</span></div>
+              <ul>
+                <li><svg class="icon"><use href="#i-offline"/></svg><span>不联网，无账号，无云同步</span></li>
+                <li><svg class="icon"><use href="#i-eye"/></svg><span>敏感字段默认隐藏，需要手动查看</span></li>
+                <li><svg class="icon"><use href="#i-lock"/></svg><span>备份文件独立加密，可离线恢复</span></li>
+              </ul>
+            </div>
+            <div class="section-head"><i class="index-line"></i><h2>安全能力</h2></div>
+            <div class="settings-sheet">
+              <div class="settings-row"><svg class="icon"><use href="#i-offline"/></svg><div><b>联网能力</b><small>应用不申请网络权限</small></div><span class="settings-value">未启用</span></div>
+              <div class="settings-row"><svg class="icon"><use href="#i-person"/></svg><div><b>账号登录</b><small>资料不依赖在线账号</small></div><span class="settings-value">无需账号</span></div>
+              <div class="settings-row"><svg class="icon"><use href="#i-eye"/></svg><div><b>敏感字段</b><small>打开详情时默认隐藏</small></div><span class="settings-value">默认隐藏</span></div>
+            </div>
+            <div class="section-head"><i class="index-line"></i><h2>安全设置</h2></div>
+            <div class="settings-sheet">
+              <div class="settings-row"><svg class="icon"><use href="#i-shield"/></svg><div><b>屏幕内容保护</b><small>限制敏感页面截图和录屏</small></div><span class="settings-value">仅敏感页</span></div>
+              <div class="settings-row"><svg class="icon"><use href="#i-lock"/></svg><div><b>应用锁</b><small>指纹或 PIN 保护本机资料</small></div><span class="settings-value">已启用</span></div>
+              <div class="settings-row"><svg class="icon"><use href="#i-file"/></svg><div><b>备份与恢复</b><small>创建、验证和恢复加密备份</small></div><span class="chev"><svg class="icon"><use href="#i-chevron"/></svg></span></div>
+            </div>
+          </div>
+          <nav class="bottom-nav">
+            <button class="nav-item" data-open="home"><svg class="icon"><use href="#i-home"/></svg><span>首页</span></button>
+            <button class="nav-item" data-open="members"><svg class="icon"><use href="#i-users"/></svg><span>成员</span></button>
+            <button class="nav-item" data-open="categories"><svg class="icon"><use href="#i-folder"/></svg><span>分类</span></button>
+            <button class="nav-item active" data-open="settings"><svg class="icon"><use href="#i-person"/></svg><span>我的</span></button>
+          </nav>
+        </section>
+
+        <section class="page no-nav" data-page="detail">
+          <div class="topbar">
+            <button class="top-icon" data-back aria-label="返回"><svg class="icon"><use href="#i-back"/></svg></button>
+            <h1>信用卡</h1>
+            <div class="topbar-actions"><button class="top-icon" data-go="edit" aria-label="编辑"><svg class="icon"><use href="#i-edit"/></svg></button></div>
+          </div>
+          <div class="scroll">
+            <header class="detail-hero">
+              <div class="eyebrow">BANK CARD / 0014</div>
+              <h2>差旅测试卡</h2>
+              <p>归属 林安 · 远山测试银行 · 银联</p>
+            </header>
+            <div class="attachment-row">
+              <span class="attachment-thumb"><svg class="icon"><use href="#i-image"/></svg></span>
+              <div><b>附件</b><div style="margin-top:4px;color:var(--ink-3);font-size:11px">尚未添加照片或文件</div></div>
+              <span>添加</span>
+            </div>
+            <section class="sensitive">
+              <div class="sensitive-label"><span class="mini-spine"><i></i><i></i></span><span>卡号 · 敏感字段</span><small>仅本机可见</small></div>
+              <div class="secret-number" id="secretNumber">•••• · •••• · •••• · 0014</div>
+              <div class="secret-actions">
+                <button class="secondary-btn" id="revealBtn"><svg class="icon"><use href="#i-eye"/></svg><span>查看</span></button>
+                <button class="primary-btn" data-copy><svg class="icon"><use href="#i-copy"/></svg><span>复制</span></button>
+              </div>
+            </section>
+            <section class="field-section">
+              <div class="field-section-title"><i class="index-line"></i><span>卡片信息</span></div>
+              <div class="field-list">
+                <div class="field-row"><span class="label">银行名称</span><span class="value">远山测试银行</span><button class="mini-copy" data-copy><svg class="icon"><use href="#i-copy"/></svg></button></div>
+                <div class="field-row"><span class="label">卡片别名</span><span class="value">差旅测试卡</span><span></span></div>
+                <div class="field-row"><span class="label">户名</span><span class="value">林安</span><button class="mini-copy" data-copy><svg class="icon"><use href="#i-copy"/></svg></button></div>
+                <div class="field-row"><span class="label">账单日</span><span class="value">每月 8 日</span><span></span></div>
+                <div class="field-row"><span class="label">还款日</span><span class="value">每月 26 日</span><span></span></div>
+                <div class="field-row"><span class="label">有效期</span><span class="value">2029-12-31</span><span></span></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="page no-nav" data-page="edit">
+          <div class="topbar">
+            <button class="top-icon" data-back aria-label="返回"><svg class="icon"><use href="#i-back"/></svg></button>
+            <h1>编辑信用卡</h1>
+            <div class="topbar-actions"><button class="top-icon" data-back aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div>
+          </div>
+          <div class="edit-progress">
+            <div class="edit-progress-head"><b>3 / 4</b><span style="color:var(--ink-3)">本地保存</span></div>
+            <div class="steps"><i class="step done"></i><i class="step done"></i><i class="step done"></i><i class="step"></i></div>
+          </div>
+          <div class="scroll" style="padding-bottom:100px">
+            <section class="form-section">
+              <div class="form-title"><i class="index-line"></i><span>基本信息</span></div>
+              <div class="form-field"><label>银行名称</label><input class="form-control" value="远山测试银行"></div>
+              <div class="form-field"><label>卡片别名</label><input class="form-control" value="差旅测试卡"></div>
+              <div class="form-field"><label>卡号 <span class="required">*</span></label><input class="form-control" value="9999000000000014"><div class="form-help">保存后默认隐藏，仅在主动查看时显示</div></div>
+              <div class="form-field"><label>卡组织</label><input class="form-control" value="银联"><div class="form-help">银联、Visa、Mastercard 等</div></div>
+              <div class="form-field"><label>户名</label><input class="form-control" value="林安"></div>
+            </section>
+            <section class="form-section">
+              <div class="form-title"><i class="index-line"></i><span>重要日期</span></div>
+              <div class="form-field"><label>账单日</label><input class="form-control" value="每月 8 日"></div>
+              <div class="form-field"><label>还款日</label><input class="form-control" value="每月 26 日"></div>
+            </section>
+          </div>
+          <div class="edit-actions"><button class="wide-primary" id="saveBtn">下一步</button></div>
+        </section>
+        <div class="toast" id="toast">已复制到剪贴板</div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="review-notes">
+    <div class="kicker">V2 DESIGN INTENT</div>
+    <h2>白色不是空，而是让细节成为质感来源</h2>
+    <p>这版不再依赖“浅灰底叠白卡片”。页面主体保持近纯白，只让重点资料、敏感铭牌和少量功能区域拥有完整表面。</p>
+    <ol>
+      <li>双线册脊成为专属结构符号，替代装饰插画和品牌渐变。</li>
+      <li>首页用数字排版表现账单日与还款日，不再堆叠描边标签。</li>
+      <li>分类页改为现代索引册结构，去除标准圆形图标底块。</li>
+      <li>敏感字段使用专属铭牌，信息、查看与复制形成稳定结构。</li>
+      <li>普通内容保持白色和平面，关键内容才获得完整边界与轻微空间感。</li>
+    </ol>
+    <div class="swatches">
+      <i style="--c:#f4f6f4"></i><i style="--c:#ffffff"></i><i style="--c:#527d78"></i><i style="--c:#dfeae7"></i><i style="--c:#9e4e50"></i>
+    </div>
+  </aside>
+</main>
+
+<script>
+  let currentPage = "home";
+  const pageHistory = [];
+
+  function renderPage(name){
+    currentPage = name;
+    document.querySelectorAll(".page").forEach(page => page.classList.toggle("active", page.dataset.page === name));
+    document.querySelectorAll(".review-tab").forEach(tab => tab.classList.toggle("active", tab.dataset.open === name));
+    document.querySelectorAll(`.page[data-page="${name}"] .scroll`).forEach(scroller => scroller.scrollTop = 0);
+  }
+
+  function openPage(name, recordHistory = true){
+    if(name === currentPage) return;
+    if(recordHistory) pageHistory.push(currentPage);
+    renderPage(name);
+  }
+
+  function goBack(){
+    renderPage(pageHistory.pop() || "home");
+  }
+
+  document.addEventListener("click", (event) => {
+    const open = event.target.closest("[data-open]");
+    const go = event.target.closest("[data-go]");
+    const back = event.target.closest("[data-back]");
+    if(open) openPage(open.dataset.open);
+    if(go) openPage(go.dataset.go);
+    if(back) goBack();
+  });
+
+  const modeToggle = document.getElementById("modeToggle");
+  modeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    modeToggle.textContent = document.body.classList.contains("dark") ? "亮色" : "暗色";
+  });
+
+  const secret = document.getElementById("secretNumber");
+  const revealBtn = document.getElementById("revealBtn");
+  let revealed = false;
+  revealBtn.addEventListener("click", () => {
+    revealed = !revealed;
+    secret.textContent = revealed ? "9999 · 0000 · 0000 · 0014" : "•••• · •••• · •••• · 0014";
+    revealBtn.querySelector("span").textContent = revealed ? "隐藏" : "查看";
+  });
+
+  const toast = document.getElementById("toast");
+  function showToast(text){
+    toast.textContent = text;
+    toast.classList.add("show");
+    clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => toast.classList.remove("show"), 1500);
+  }
+  document.querySelectorAll("[data-copy]").forEach(button => button.addEventListener("click", () => showToast("已复制，离开页面后自动清除提示")));
+  document.getElementById("saveBtn").addEventListener("click", () => showToast("已保存到本机"));
+</script>
+</body>
+</html>

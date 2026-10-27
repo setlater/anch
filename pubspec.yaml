@@ -1,0 +1,61 @@
+name: anch
+description: "安册：Android 优先、不联网的家庭重要资料本地管理工具。"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.12.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  flutter_svg: ^2.3.0
+  meta: ^1.12.0
+
+  # Drift database and core sqlite dependencies
+  drift: ^2.33.0
+  sqlite3: ^3.3.2
+
+  # Path utils
+  path: ^1.9.1
+  path_provider: ^2.1.5
+  image_picker: ^1.1.2
+  image_picker_android: ^0.8.13+19
+  image_picker_platform_interface: ^2.11.0
+  flutter_image_compress: ^2.4.0
+  extended_image: 10.1.0
+
+  # Local key protection and authenticated encryption
+  flutter_secure_storage: ^10.3.1
+  cryptography: ^2.9.0
+  gal: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  drift_dev: ^2.33.0
+  build_runner: ^2.15.0
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  licenses:
+    - assets/licenses/china-division-2.7.0.txt
+    - assets/licenses/sqlite3mc-2.3.4.txt
+    - assets/licenses/android-dependencies.txt
+  assets:
+    - assets/icons/solar/1.2.5/
+
+# SQLite3MultipleCiphers (SQLiteMC) 加密库接入
+# 通过 sqlite3 包的 hooks 机制，将 sqlite3mc 替换默认 sqlite3 进行编译
+# 参考：https://drift.simonbinder.eu/platforms/encryption/
+# securityValidation 与 formal 使用真实加密 opener；dev 默认使用内存数据库
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc

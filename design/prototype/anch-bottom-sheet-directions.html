@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>安册 · 底部弹窗方向对比</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --workbench: #e9eeec;
+      --surface: #ffffff;
+      --canvas: #fdfefd;
+      --soft: #f3f6f5;
+      --accent-soft: #dfeae7;
+      --ink: #171d1b;
+      --ink-2: #4f5c58;
+      --muted: #687471;
+      --line: #dce2df;
+      --accent: #557d78;
+      --accent-deep: #365e59;
+      --danger: #9d4f52;
+      --danger-soft: #f5e9e8;
+      --phone-shadow: 0 24px 64px rgba(23, 42, 36, .14);
+      --r-sheet: 18px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --workbench: #0f1412;
+      --surface: #1c2321;
+      --canvas: #151a18;
+      --soft: #232c29;
+      --accent-soft: #29413d;
+      --ink: #edf2f0;
+      --ink-2: #bdc8c4;
+      --muted: #8f9b97;
+      --line: #34403d;
+      --accent: #9abdb7;
+      --accent-deep: #cae2de;
+      --danger: #e39a9d;
+      --danger-soft: #452c2d;
+      --phone-shadow: none;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--workbench);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font: inherit; }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 68px;
+      padding: 12px max(20px, calc((100vw - 1440px) / 2));
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      backdrop-filter: blur(16px);
+    }
+    .brand { min-width: 168px; }
+    .brand b { display: block; font-size: 15px; letter-spacing: .01em; }
+    .brand span { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .switcher { display: flex; gap: 6px; overflow: auto; scrollbar-width: none; }
+    .switcher::-webkit-scrollbar { display: none; }
+    .switcher button, .theme-toggle {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--ink-2);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .switcher button.active, .theme-toggle {
+      border-color: var(--line);
+      background: var(--surface);
+      color: var(--accent-deep);
+    }
+    .theme-toggle { margin-left: auto; }
+
+    .intro {
+      width: min(1200px, calc(100% - 40px));
+      margin: 28px auto 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 252px;
+      gap: 28px;
+      align-items: end;
+    }
+    .eyebrow { color: var(--accent-deep); font-size: 12px; font-weight: 750; letter-spacing: .08em; }
+    h1 { margin: 8px 0 0; font-size: clamp(26px, 3vw, 38px); letter-spacing: -.045em; line-height: 1.15; }
+    .intro p { max-width: 710px; margin: 12px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.75; }
+    .rule-note {
+      padding: 14px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface));
+      color: var(--ink-2);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+    .rule-note b { display: block; color: var(--ink); font-size: 13px; }
+
+    .directions {
+      width: min(1200px, calc(100% - 40px));
+      margin: 28px auto 52px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(236px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    .direction { min-width: 0; }
+    .direction-heading { min-height: 108px; padding: 0 2px 14px; }
+    .direction-heading .label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 5px;
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .04em;
+    }
+    .direction-heading h2 { margin: 9px 0 0; font-size: 17px; letter-spacing: -.025em; }
+    .direction-heading p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+
+    .phone {
+      position: relative;
+      min-height: 606px;
+      overflow: hidden;
+      border: 1px solid color-mix(in srgb, var(--line) 86%, var(--ink));
+      border-radius: 26px;
+      background: var(--canvas);
+      box-shadow: var(--phone-shadow);
+    }
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 34px;
+      padding: 0 18px;
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-dots { letter-spacing: .14em; }
+    .page-head { padding: 24px 18px 0; }
+    .page-head .back { display: inline-block; color: var(--ink-2); font-size: 18px; line-height: 1; }
+    .page-head h3 { margin: 20px 0 0; font-size: 22px; letter-spacing: -.04em; }
+    .page-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .field-skeleton { margin: 25px 18px 0; border-top: 1px solid var(--line); }
+    .field-skeleton span { display: block; height: 61px; border-bottom: 1px solid var(--line); }
+    .field-skeleton span::before {
+      content: "";
+      display: block;
+      width: 42%;
+      height: 7px;
+      margin-top: 17px;
+      border-radius: 4px;
+      background: var(--soft);
+    }
+    .field-skeleton span:nth-child(2)::before { width: 66%; }
+    .field-skeleton span:nth-child(3)::before { width: 34%; }
+    .scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 27, 23, .20);
+    }
+    body.dark .scrim { background: rgba(0, 0, 0, .30); }
+    .sheet {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow: hidden;
+      border-top: 1px solid var(--line);
+      border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+      background: var(--surface);
+    }
+    .handle { width: 32px; height: 3px; margin: 10px auto 0; border-radius: 999px; background: var(--line); }
+    .sheet-title { padding: 15px 18px 13px; }
+    .sheet-title b { display: block; font-size: 17px; letter-spacing: -.02em; }
+    .sheet-title span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .solar { display: inline-grid; width: 20px; height: 20px; place-items: center; flex: 0 0 auto; }
+    .solar svg { width: 20px; height: 20px; }
+
+    /* A：平面档案。把它当作页面底部的操作目录，不再加卡片套卡片。 */
+    .archive-list .sheet-title { padding-bottom: 10px; }
+    .archive-list .option-list { border-top: 1px solid var(--line); }
+    .archive-list .option {
+      min-height: 62px;
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .archive-list .option .solar { color: var(--ink-2); }
+    .archive-list .option b { display: block; font-size: 15px; font-weight: 650; }
+    .archive-list .option small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .archive-list .chevron { color: var(--muted); font-size: 17px; }
+    .archive-list .cancel { height: 56px; display: grid; place-items: center; color: var(--ink-2); font-size: 14px; font-weight: 650; }
+
+    /* B：索引标签。极轻的左侧标识，适合选项含用途说明的附件入口。 */
+    .index-tabs .sheet-title { padding-bottom: 14px; }
+    .index-tabs .option-wrap { padding: 0 12px; }
+    .index-tabs .option {
+      position: relative;
+      min-height: 68px;
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 12px 10px 15px;
+      border-top: 1px solid var(--line);
+    }
+    .index-tabs .option::before { content: ""; position: absolute; top: 17px; bottom: 17px; left: 0; width: 2px; border-radius: 2px; background: var(--accent); opacity: .72; }
+    .index-tabs .option .solar { color: var(--accent-deep); }
+    .index-tabs .option b { display: block; font-size: 15px; font-weight: 650; }
+    .index-tabs .option small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .index-tabs .cancel { margin: 2px 12px 11px; height: 46px; display: grid; place-items: center; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 14px; font-weight: 650; }
+
+    /* C：紧凑动作表。只给动作，不让“资料操作”显得像设置页。 */
+    .action-menu .sheet-title { display: flex; align-items: center; justify-content: space-between; padding-bottom: 13px; }
+    .action-menu .sheet-title span { margin: 0; }
+    .action-menu .actions { padding: 0 12px 10px; }
+    .action-menu .option {
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      align-items: center;
+      gap: 11px;
+      padding: 0 9px;
+      border-top: 1px solid var(--line);
+    }
+    .action-menu .option b { font-size: 15px; font-weight: 620; }
+    .action-menu .option .solar { color: var(--ink-2); }
+    .action-menu .option.danger { color: var(--danger); }
+    .action-menu .option.danger .solar { color: var(--danger); }
+    .action-menu .cancel { margin: 0 12px 12px; height: 44px; display: grid; place-items: center; border-radius: 8px; background: var(--soft); color: var(--ink-2); font-size: 14px; font-weight: 650; }
+
+    /* D：选择条。用行内选择状态表达设置值，不另起彩色卡片。 */
+    .choice-rows .sheet-title { padding-bottom: 8px; }
+    .choice-rows .choice { min-height: 62px; display: grid; grid-template-columns: 1fr 22px; align-items: center; gap: 12px; padding: 10px 18px; border-top: 1px solid var(--line); }
+    .choice-rows .choice b { display: block; font-size: 15px; font-weight: 650; }
+    .choice-rows .choice small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .choice-rows .choice.selected { background: color-mix(in srgb, var(--accent-soft) 48%, var(--surface)); }
+    .choice-rows .choice.selected b { color: var(--accent-deep); }
+    .choice-rows .choice .solar { color: var(--accent); }
+    .choice-rows .cancel { height: 54px; display: grid; place-items: center; color: var(--ink-2); font-size: 14px; font-weight: 650; }
+
+    .comparison {
+      width: min(1200px, calc(100% - 40px));
+      margin: -28px auto 52px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--surface) 82%, transparent);
+    }
+    .comparison h2 { margin: 0; font-size: 15px; }
+    .comparison-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+    .comparison-grid div { padding: 12px; border-left: 2px solid var(--line); color: var(--ink-2); font-size: 12px; line-height: 1.6; }
+    .comparison-grid b { display: block; color: var(--ink); font-size: 13px; }
+    .comparison-grid .recommended { border-color: var(--accent); }
+
+    @media (max-width: 1060px) {
+      .directions { grid-template-columns: repeat(2, minmax(250px, 1fr)); max-width: 740px; }
+      .intro, .comparison { max-width: 740px; }
+      .comparison-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .toolbar { align-items: flex-start; flex-wrap: wrap; padding: 11px 16px; }
+      .brand { width: 100%; }
+      .theme-toggle { margin-left: 0; }
+      .intro { width: min(100% - 28px, 390px); margin-top: 22px; display: block; }
+      .rule-note { margin-top: 18px; }
+      .directions { width: min(100% - 28px, 390px); grid-template-columns: 1fr; gap: 30px; }
+      .direction-heading { min-height: auto; }
+      .phone { min-height: 594px; }
+      .comparison { width: min(100% - 28px, 390px); margin-top: -5px; }
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <div class="brand"><b>安册 · 底部弹窗</b><span>仅视觉方向，不对应当前 Flutter 实现</span></div>
+    <nav class="switcher" aria-label="示例内容">
+      <button class="active" data-context="attachment">附件来源</button>
+      <button data-context="actions">资料操作</button>
+      <button data-context="lock">自动锁定</button>
+    </nav>
+    <button class="theme-toggle" type="button">查看暗色</button>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div>
+        <div class="eyebrow">VISUAL DIRECTION STUDY</div>
+        <h1>把弹窗做得更像档案目录，少一点通用组件感。</h1>
+        <p>这四个方向都保留 48 逻辑像素触控目标、系统安全区和长内容可滚动。区别只在信息分组、图标存在感、取消入口与危险操作的表达。</p>
+      </div>
+      <aside class="rule-note"><b>这次刻意避开</b>重描边卡片、彩色危险框、重复的圆角容器和“卡片里再放卡片”。</aside>
+    </section>
+
+    <section class="directions" aria-label="四种底部弹窗设计方案">
+      <article class="direction">
+        <div class="direction-heading">
+          <span class="label">方案 A · 推荐</span>
+          <h2>平面档案</h2>
+          <p>以细分隔线组织内容，图标退为辅助。最接近安册的资料字段轨道。</p>
+        </div>
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="status-dots">● ● ●</span></div>
+          <div class="page-head"><span class="back">‹</span><h3>身份证</h3><p>张三 · 资料详情</p></div>
+          <div class="field-skeleton"><span></span><span></span><span></span></div>
+          <div class="scrim"></div>
+          <section class="sheet archive-list" data-variant="archive">
+            <div class="handle"></div>
+            <div class="sheet-title"><b></b><span></span></div>
+            <div class="option-list"></div>
+            <div class="cancel">取消</div>
+          </section>
+        </div>
+      </article>
+
+      <article class="direction">
+        <div class="direction-heading">
+          <span class="label">方案 B</span>
+          <h2>册脊索引</h2>
+          <p>每行只有一条轻册脊色块，适合附件来源这类带用途说明的入口。</p>
+        </div>
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="status-dots">● ● ●</span></div>
+          <div class="page-head"><span class="back">‹</span><h3>身份证</h3><p>张三 · 资料详情</p></div>
+          <div class="field-skeleton"><span></span><span></span><span></span></div>
+          <div class="scrim"></div>
+          <section class="sheet index-tabs" data-variant="index">
+            <div class="handle"></div>
+            <div class="sheet-title"><b></b><span></span></div>
+            <div class="option-wrap"></div>
+            <div class="cancel">取消</div>
+          </section>
+        </div>
+      </article>
+
+      <article class="direction">
+        <div class="direction-heading">
+          <span class="label">方案 C</span>
+          <h2>紧凑动作表</h2>
+          <p>短操作不再附带说明。删除仅用文字与图标变色，避免危险框过重。</p>
+        </div>
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="status-dots">● ● ●</span></div>
+          <div class="page-head"><span class="back">‹</span><h3>身份证</h3><p>张三 · 资料详情</p></div>
+          <div class="field-skeleton"><span></span><span></span><span></span></div>
+          <div class="scrim"></div>
+          <section class="sheet action-menu" data-variant="action">
+            <div class="handle"></div>
+            <div class="sheet-title"><b></b><span></span></div>
+            <div class="actions"></div>
+            <div class="cancel">取消</div>
+          </section>
+        </div>
+      </article>
+
+      <article class="direction">
+        <div class="direction-heading">
+          <span class="label">方案 D</span>
+          <h2>设置选择条</h2>
+          <p>选中只改变当前行与勾选，不再额外堆叠选中卡片；适合单选设置。</p>
+        </div>
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="status-dots">● ● ●</span></div>
+          <div class="page-head"><span class="back">‹</span><h3>应用锁</h3><p>自动锁定方式</p></div>
+          <div class="field-skeleton"><span></span><span></span><span></span></div>
+          <div class="scrim"></div>
+          <section class="sheet choice-rows" data-variant="choice">
+            <div class="handle"></div>
+            <div class="sheet-title"><b></b><span></span></div>
+            <div class="choices"></div>
+            <div class="cancel">取消</div>
+          </section>
+        </div>
+      </article>
+    </section>
+
+    <section class="comparison">
+      <h2>如何选</h2>
+      <div class="comparison-grid">
+        <div class="recommended"><b>A：平面档案</b>我推荐作为默认。它最克制、可扩展，附件、复制、资料操作和日期选择都能共用一个结构。</div>
+        <div><b>B：册脊索引</b>信息层级更强，但若每个弹窗都使用色块，可能会把「册脊」从区块标识用成装饰。</div>
+        <div><b>C：紧凑动作表</b>适合「资料操作」「复制内容」；不适合带说明、选项数多或需要明确选中态的场景。</div>
+        <div><b>D：设置选择条</b>适合单选和滚轮类顶部操作；不建议用于附件来源，否则会显得像设置页。</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./assets/solar/1.2.5/icons.js"></script>
+  <script>
+    const contexts = {
+      attachment: {
+        title: '选择附件来源',
+        description: '还可添加 4 个附件',
+        options: [
+          { icon: 'upload-linear', title: '拍照', description: '直接拍摄纸质资料' },
+          { icon: 'documents-minimalistic-linear', title: '从相册选择', description: '推荐添加图片' },
+          { icon: 'folder-with-files-linear', title: '从文件导入', description: '用于 PDF、TXT 和常见文档' },
+        ],
+      },
+      actions: {
+        title: '资料操作',
+        description: '身份证 · 张三',
+        options: [
+          { icon: 'check-circle-linear', title: '设为置顶', description: '在首页优先展示' },
+          { icon: 'archive-linear', title: '归档资料', description: '从常用列表中收起' },
+          { icon: 'pen-linear', title: '编辑', description: '修改资料内容' },
+          { icon: 'trash-bin-trash-linear', title: '删除', description: '移入最近删除', danger: true },
+        ],
+      },
+      lock: {
+        title: '自动锁定方式',
+        description: '选择离开安册后的锁定时机',
+        options: [
+          { icon: 'check-circle-linear', title: '每次回到安册时', description: '切到后台后再次返回即要求解锁', selected: true },
+          { icon: 'clock-circle-linear', title: '重新打开安册时', description: '应用终止后下次打开时要求解锁' },
+        ],
+      },
+    };
+
+    function solar(name) {
+      const icon = window.ANCH_SOLAR_ICONS.icons[name];
+      return icon ? `<span class="solar"><svg viewBox="0 0 24 24" aria-hidden="true">${icon.body}</svg></span>` : '';
+    }
+
+    function plainOption(option) {
+      return `<div class="option${option.danger ? ' danger' : ''}">${solar(option.icon)}<div><b>${option.title}</b><small>${option.description}</small></div><span class="chevron">›</span></div>`;
+    }
+
+    function indexOption(option) {
+      return `<div class="option${option.danger ? ' danger' : ''}">${solar(option.icon)}<div><b>${option.title}</b><small>${option.description}</small></div></div>`;
+    }
+
+    function actionOption(option) {
+      return `<div class="option${option.danger ? ' danger' : ''}">${solar(option.icon)}<b>${option.title}</b></div>`;
+    }
+
+    function choiceOption(option) {
+      return `<div class="choice${option.selected ? ' selected' : ''}"><div><b>${option.title}</b><small>${option.description}</small></div>${option.selected ? solar('check-circle-linear') : ''}</div>`;
+    }
+
+    function render(contextName) {
+      const context = contexts[contextName];
+      document.querySelectorAll('.sheet-title b').forEach((node) => node.textContent = context.title);
+      document.querySelectorAll('.sheet-title span').forEach((node) => node.textContent = context.description);
+      document.querySelector('.archive-list .option-list').innerHTML = context.options.map(plainOption).join('');
+      document.querySelector('.index-tabs .option-wrap').innerHTML = context.options.map(indexOption).join('');
+      document.querySelector('.action-menu .actions').innerHTML = context.options.map(actionOption).join('');
+      document.querySelector('.choice-rows .choices').innerHTML = context.options.map(choiceOption).join('');
+      document.querySelectorAll('.switcher button').forEach((button) => button.classList.toggle('active', button.dataset.context === contextName));
+    }
+
+    document.querySelectorAll('.switcher button').forEach((button) => {
+      button.addEventListener('click', () => render(button.dataset.context));
+    });
+    document.querySelector('.theme-toggle').addEventListener('click', (event) => {
+      const isDark = document.body.classList.toggle('dark');
+      event.currentTarget.textContent = isDark ? '查看亮色' : '查看暗色';
+    });
+    render('attachment');
+  </script>
+</body>
+</html>

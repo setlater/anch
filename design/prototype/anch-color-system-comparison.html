@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>安册三套配色同构对比</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+      background: #ecebed;
+      color: #242128;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background: #ecebed;
+    }
+
+    button { font: inherit; }
+
+    .workspace {
+      width: min(1500px, 100%);
+      margin: 0 auto;
+      padding: 36px 28px 56px;
+    }
+
+    .header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .heading h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.2;
+      letter-spacing: -.03em;
+      font-weight: 650;
+    }
+
+    .heading p {
+      margin: 0;
+      color: #68646d;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid #d2cfd5;
+      border-radius: 12px;
+      background: #f7f6f8;
+    }
+
+    .tool-button {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 8px;
+      color: #58535e;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .tool-button.active {
+      color: #26222a;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(25, 20, 30, .09);
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(330px, 1fr));
+      gap: 20px;
+      align-items: start;
+    }
+
+    .concept {
+      --canvas: #f8f7fa;
+      --surface: #fff;
+      --subtle: #f0eef4;
+      --text: #242128;
+      --text-2: #58515f;
+      --text-3: #786f80;
+      --primary: #756985;
+      --on-primary: #fff;
+      --primary-container: #e8e2ee;
+      --on-primary-container: #453b52;
+      --border: #dfdae4;
+      --border-strong: #c6bfce;
+      --success: #3f7257;
+      --success-container: #e2efe7;
+      --on-success-container: #2e5942;
+      --warning: #8a6518;
+      --warning-container: #f7ebc8;
+      --on-warning-container: #6b4d0d;
+      --danger: #a24a50;
+      --on-danger: #fff;
+      --danger-container: #f6e2e4;
+      --on-danger-container: #7d343b;
+      --disabled-bg: #e9e6ec;
+      --disabled-fg: #928a98;
+    }
+
+    .concept[data-theme="a"] {
+      --canvas: #f6f8f7;
+      --subtle: #edf2f0;
+      --text: #1b2423;
+      --text-2: #4b5b58;
+      --text-3: #687471;
+      --primary: #4f7773;
+      --primary-container: #ddeae7;
+      --on-primary-container: #244844;
+      --border: #d7dfdd;
+      --border-strong: #bcc8c5;
+      --success: #2f7656;
+      --success-container: #dff0e7;
+      --on-success-container: #245b43;
+      --danger: #a34848;
+      --danger-container: #f6e2e2;
+      --on-danger-container: #7e3434;
+      --disabled-bg: #e5e9e8;
+      --disabled-fg: #8b9693;
+    }
+
+    .concept[data-theme="c"] {
+      --canvas: #faf8f5;
+      --subtle: #f3efeb;
+      --text: #29231f;
+      --text-2: #60564f;
+      --text-3: #80746c;
+      --primary: #916553;
+      --primary-container: #f0e3dc;
+      --on-primary-container: #57382d;
+      --border: #e4ddd7;
+      --border-strong: #cdc2ba;
+      --success: #4d735c;
+      --success-container: #e4efe8;
+      --on-success-container: #355841;
+      --warning: #8c6518;
+      --danger: #a14945;
+      --danger-container: #f6e2e0;
+      --on-danger-container: #7d3431;
+      --disabled-bg: #ece7e2;
+      --disabled-fg: #9a8f87;
+    }
+
+    body.dark .concept[data-theme="a"] {
+      --canvas: #111817;
+      --surface: #18211f;
+      --subtle: #202b29;
+      --text: #e8efed;
+      --text-2: #b8c5c1;
+      --text-3: #8e9d99;
+      --primary: #85aaa5;
+      --on-primary: #10211f;
+      --primary-container: #2b4a46;
+      --on-primary-container: #ddeae7;
+      --border: #34413f;
+      --border-strong: #4a5a57;
+      --success: #79c59e;
+      --success-container: #1d3a2d;
+      --on-success-container: #a7dbbe;
+      --warning: #d9b75b;
+      --warning-container: #403517;
+      --on-warning-container: #f0d47e;
+      --danger: #e09999;
+      --on-danger: #301416;
+      --danger-container: #472424;
+      --on-danger-container: #f0b1b1;
+      --disabled-bg: #293230;
+      --disabled-fg: #65716e;
+    }
+
+    body.dark .concept[data-theme="b"] {
+      --canvas: #17151a;
+      --surface: #201d23;
+      --subtle: #29252d;
+      --text: #f0ecf3;
+      --text-2: #c8c0cd;
+      --text-3: #9f95a6;
+      --primary: #afa1be;
+      --on-primary: #201927;
+      --primary-container: #403649;
+      --on-primary-container: #e8e2ee;
+      --border: #3e3944;
+      --border-strong: #57505e;
+      --success: #79bf95;
+      --success-container: #20372a;
+      --on-success-container: #a7d6b9;
+      --warning: #d7b455;
+      --warning-container: #403517;
+      --on-warning-container: #ebcf78;
+      --danger: #dc8d94;
+      --on-danger: #2d1215;
+      --danger-container: #472529;
+      --on-danger-container: #ecaAAF;
+      --disabled-bg: #302c34;
+      --disabled-fg: #706876;
+    }
+
+    body.dark .concept[data-theme="c"] {
+      --canvas: #191614;
+      --surface: #231f1c;
+      --subtle: #2d2824;
+      --text: #f1ece8;
+      --text-2: #c9c0ba;
+      --text-3: #a1968f;
+      --primary: #c49a88;
+      --on-primary: #281711;
+      --primary-container: #54372c;
+      --on-primary-container: #f0e3dc;
+      --border: #423a35;
+      --border-strong: #5d514a;
+      --success: #82b194;
+      --success-container: #24372b;
+      --on-success-container: #b0d3bc;
+      --warning: #d4ae4e;
+      --warning-container: #413516;
+      --on-warning-container: #e8cb76;
+      --danger: #d98680;
+      --on-danger: #2f1311;
+      --danger-container: #472522;
+      --on-danger-container: #eaa9a5;
+      --disabled-bg: #332e2a;
+      --disabled-fg: #756a63;
+    }
+
+    .concept-header {
+      min-height: 108px;
+      padding: 18px 18px 16px;
+      border: 1px solid #d7d4d9;
+      border-bottom: 0;
+      border-radius: 18px 18px 0 0;
+      background: #f8f7f9;
+    }
+
+    .concept-header .index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      margin-right: 8px;
+      border-radius: 7px;
+      color: var(--on-primary);
+      background: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .concept-header h2 {
+      display: inline;
+      margin: 0;
+      font-size: 18px;
+      font-weight: 650;
+    }
+
+    .concept-header p {
+      margin: 9px 0 0 38px;
+      color: #706b74;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .phone-frame {
+      padding: 10px;
+      border: 1px solid #d7d4d9;
+      border-radius: 0 0 22px 22px;
+      background: #dedce0;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      height: 704px;
+      overflow: hidden;
+      border-radius: 14px;
+      color: var(--text);
+      background: var(--canvas);
+      transition: color .2s, background .2s;
+    }
+
+    .statusbar {
+      height: 32px;
+      padding: 9px 18px 0;
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-2);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .status-icons { letter-spacing: 2px; }
+
+    .screen {
+      display: none;
+      height: calc(100% - 32px);
+      flex-direction: column;
+    }
+
+    .screen.active { display: flex; }
+
+    .topbar {
+      min-height: 58px;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .topbar h3 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.3;
+      font-weight: 650;
+      letter-spacing: -.02em;
+    }
+
+    .icon-button {
+      width: 48px;
+      height: 48px;
+      border: 0;
+      border-radius: 10px;
+      color: var(--text-2);
+      background: transparent;
+      font-size: 24px;
+    }
+
+    .main {
+      flex: 1;
+      min-height: 0;
+      padding: 4px 16px 20px;
+      overflow: auto;
+      scrollbar-width: none;
+    }
+
+    .main::-webkit-scrollbar { display: none; }
+
+    .search {
+      height: 52px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      color: var(--text-3);
+      background: var(--surface);
+      font-size: 14px;
+    }
+
+    .section-row {
+      margin: 22px 0 9px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-row h4 {
+      margin: 0;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .section-row span {
+      color: var(--text-3);
+      font-size: 12px;
+    }
+
+    .notice {
+      padding: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      border-radius: 10px;
+      color: var(--on-warning-container);
+      background: var(--warning-container);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .notice strong { font-weight: 650; }
+
+    .record-list {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .record {
+      min-height: 72px;
+      padding: 12px 4px;
+      display: grid;
+      grid-template-columns: 36px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .record:last-child { border-bottom: 0; }
+
+    .record-icon {
+      color: var(--text-2);
+      font-size: 22px;
+      text-align: center;
+    }
+
+    .record-title {
+      margin-bottom: 4px;
+      font-size: 15px;
+      line-height: 1.4;
+      font-weight: 650;
+    }
+
+    .record-meta {
+      color: var(--text-2);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .tag {
+      min-height: 24px;
+      padding: 3px 8px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      color: var(--on-warning-container);
+      background: var(--warning-container);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .tag.success {
+      color: var(--on-success-container);
+      background: var(--success-container);
+    }
+
+    .primary-button,
+    .danger-button,
+    .secondary-button {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .primary-button {
+      border: 1px solid var(--primary);
+      color: var(--on-primary);
+      background: var(--primary);
+    }
+
+    .danger-button {
+      border: 1px solid var(--danger);
+      color: var(--on-danger);
+      background: var(--danger);
+    }
+
+    .secondary-button {
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    .bottom-action {
+      padding: 12px 16px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .bottom-nav {
+      min-height: 64px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .nav-item {
+      position: relative;
+      min-height: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--text-2);
+      font-size: 11px;
+    }
+
+    .nav-item.active { color: var(--primary); font-weight: 650; }
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 28px;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .nav-icon { font-size: 20px; }
+
+    .lock-main {
+      flex: 1;
+      padding: 26px 28px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .lock-mark {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      font-size: 30px;
+    }
+
+    .lock-main h3 {
+      margin: 14px 0 8px;
+      font-size: 24px;
+      font-weight: 650;
+    }
+
+    .lock-main > p {
+      margin: 0;
+      color: var(--text-2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .pin-dots {
+      margin: 34px 0 28px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .pin-dot {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border-strong);
+      border-radius: 50%;
+    }
+
+    .pin-dot.filled {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .keypad {
+      width: min(300px, 100%);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px 14px;
+    }
+
+    .key {
+      min-height: 56px;
+      border: 0;
+      border-radius: 10px;
+      color: var(--text);
+      background: transparent;
+      font-size: 23px;
+      font-weight: 500;
+    }
+
+    .key.muted { color: var(--text-2); font-size: 13px; }
+
+    .lock-link {
+      margin-top: auto;
+      min-height: 48px;
+      padding: 0 12px;
+      border: 0;
+      color: var(--primary);
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .reset-intro {
+      margin-bottom: 20px;
+      color: var(--text-2);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .risk-box {
+      padding: 14px;
+      display: flex;
+      gap: 10px;
+      border-radius: 10px;
+      color: var(--on-danger-container);
+      background: var(--danger-container);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .risk-box strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+
+    .impact-list {
+      margin: 20px 0 24px;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .impact-list li {
+      min-height: 56px;
+      padding: 12px 2px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .impact-list span {
+      color: var(--text-2);
+      font-size: 20px;
+    }
+
+    .check-row {
+      min-height: 56px;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .checkbox {
+      flex: 0 0 auto;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--border-strong);
+      border-radius: 5px;
+      background: var(--surface);
+    }
+
+    .palette {
+      padding: 15px 12px 4px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+
+    .swatch {
+      height: 32px;
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 6px;
+    }
+
+    .swatch:nth-child(1) { background: var(--canvas); }
+    .swatch:nth-child(2) { background: var(--primary); }
+    .swatch:nth-child(3) { background: var(--success); }
+    .swatch:nth-child(4) { background: var(--warning); }
+    .swatch:nth-child(5) { background: var(--danger); }
+
+    .palette-labels {
+      padding: 0 12px 14px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+      color: #7a757e;
+      font-size: 9px;
+      text-align: center;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      color: #eeeaf0;
+      background: #100f11;
+    }
+
+    body.dark .workspace { background: #100f11; }
+    body.dark .heading p { color: #a39da7; }
+    body.dark .toolbar-group { border-color: #39363c; background: #1d1b1f; }
+    body.dark .tool-button { color: #b3adb7; }
+    body.dark .tool-button.active { color: #f3eff5; background: #343137; box-shadow: none; }
+    body.dark .concept-header { border-color: #343136; background: #1b191c; }
+    body.dark .concept-header p { color: #a49ea8; }
+    body.dark .phone-frame { border-color: #343136; background: #29272a; }
+    body.dark .palette-labels { color: #9d97a1; }
+    body.dark .swatch { border-color: rgba(255,255,255,.12); }
+
+    @media (max-width: 1120px) {
+      .comparison { grid-template-columns: repeat(2, minmax(330px, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .workspace { padding: 24px 14px 40px; }
+      .header { align-items: stretch; flex-direction: column; }
+      .toolbar { justify-content: flex-start; }
+      .comparison { grid-template-columns: 1fr; }
+      .phone { height: 690px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="workspace">
+    <header class="header">
+      <div class="heading">
+        <h1>安册配色系统同构对比</h1>
+        <p>相同布局、相同信息、相同交互，仅切换颜色 token。所有资料均为虚构演示内容。</p>
+      </div>
+      <div class="toolbar" aria-label="演示控制">
+        <div class="toolbar-group" role="group" aria-label="页面">
+          <button class="tool-button active" data-screen-target="home">资料首页</button>
+          <button class="tool-button" data-screen-target="lock">应用锁</button>
+          <button class="tool-button" data-screen-target="reset">数据重置</button>
+        </div>
+        <div class="toolbar-group" role="group" aria-label="外观">
+          <button class="tool-button active" data-mode="light">亮色</button>
+          <button class="tool-button" data-mode="dark">暗色</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="comparison" aria-label="三套配色对比">
+      <article class="concept" data-theme="a">
+        <div class="concept-header">
+          <span class="index">A</span><h2>雾青砂</h2>
+          <p>平静、清洁、理性。品牌色与成功色最接近。</p>
+        </div>
+        <div class="phone-frame">
+          <div class="phone"></div>
+          <div class="palette" aria-hidden="true"><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i></div>
+          <div class="palette-labels"><span>背景</span><span>主色</span><span>成功</span><span>警告</span><span>危险</span></div>
+        </div>
+      </article>
+
+      <article class="concept" data-theme="b">
+        <div class="concept-header">
+          <span class="index">B</span><h2>鸢尾灰</h2>
+          <p>私密、克制、人性化。品牌色与语义色分离最佳。</p>
+        </div>
+        <div class="phone-frame">
+          <div class="phone"></div>
+          <div class="palette" aria-hidden="true"><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i></div>
+          <div class="palette-labels"><span>背景</span><span>主色</span><span>成功</span><span>警告</span><span>危险</span></div>
+        </div>
+      </article>
+
+      <article class="concept" data-theme="c">
+        <div class="concept-header">
+          <span class="index">C</span><h2>岩陶米</h2>
+          <p>温和、家庭化、长期感。需注意暖色与危险色距离。</p>
+        </div>
+        <div class="phone-frame">
+          <div class="phone"></div>
+          <div class="palette" aria-hidden="true"><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i><i class="swatch"></i></div>
+          <div class="palette-labels"><span>背景</span><span>主色</span><span>成功</span><span>警告</span><span>危险</span></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <template id="phone-content">
+    <div class="statusbar"><span>9:41</span><span class="status-icons">● ◒ ▰</span></div>
+
+    <section class="screen active" data-screen="home">
+      <div class="topbar"><h3>我的资料</h3><button class="icon-button" aria-label="更多">⋮</button></div>
+      <div class="main">
+        <div class="search"><span>⌕</span><span>搜索姓名、证件或号码</span></div>
+        <div class="section-row"><h4>需要关注</h4><span>1 项</span></div>
+        <div class="notice"><span>◷</span><div><strong>护照即将到期</strong><br />距到期还有 30 天，请提前安排更新。</div></div>
+        <div class="section-row"><h4>最近资料</h4><span>全部 4 项</span></div>
+        <div class="record-list">
+          <div class="record"><span class="record-icon">▣</span><div><div class="record-title">王小安的身份证</div><div class="record-meta">身份证 · 尾号 4821</div></div><span class="tag success">有效</span></div>
+          <div class="record"><span class="record-icon">▤</span><div><div class="record-title">王小安的护照</div><div class="record-meta">护照 · 尾号 1706</div></div><span class="tag">30 天</span></div>
+          <div class="record"><span class="record-icon">▱</span><div><div class="record-title">家庭医疗卡</div><div class="record-meta">医疗 · 3 位家庭成员</div></div><span>›</span></div>
+        </div>
+      </div>
+      <div class="bottom-action"><button class="primary-button">＋ 新增资料</button></div>
+      <nav class="bottom-nav"><div class="nav-item active"><span class="nav-icon">▤</span><span>资料</span></div><div class="nav-item"><span class="nav-icon">◷</span><span>日期</span></div><div class="nav-item"><span class="nav-icon">⚙</span><span>设置</span></div></nav>
+    </section>
+
+    <section class="screen" data-screen="lock">
+      <div class="lock-main">
+        <div class="lock-mark">⌑</div>
+        <h3>安册已锁定</h3>
+        <p>输入 6 位 PIN 查看本机资料</p>
+        <div class="pin-dots" aria-label="已输入两位"><i class="pin-dot filled"></i><i class="pin-dot filled"></i><i class="pin-dot"></i><i class="pin-dot"></i><i class="pin-dot"></i><i class="pin-dot"></i></div>
+        <div class="keypad" aria-label="数字键盘">
+          <button class="key">1</button><button class="key">2</button><button class="key">3</button>
+          <button class="key">4</button><button class="key">5</button><button class="key">6</button>
+          <button class="key">7</button><button class="key">8</button><button class="key">9</button>
+          <button class="key muted">生物识别</button><button class="key">0</button><button class="key">⌫</button>
+        </div>
+        <button class="lock-link">无法使用 PIN？</button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="reset">
+      <div class="topbar"><button class="icon-button" aria-label="返回">‹</button><h3>重置本机数据</h3><span style="width:48px"></span></div>
+      <div class="main">
+        <p class="reset-intro">此操作只影响当前设备。继续前，请确认已经创建可用的加密备份。</p>
+        <div class="risk-box"><span>!</span><div><strong>操作不可撤销</strong>所有资料、附件、提醒和应用锁设置都会从本机删除。</div></div>
+        <div class="section-row"><h4>将删除的内容</h4></div>
+        <ul class="impact-list"><li><span>▤</span>全部个人及家庭资料</li><li><span>▱</span>本机保存的附件</li><li><span>◷</span>日期提醒与应用设置</li></ul>
+        <label class="check-row"><i class="checkbox"></i><span>我已了解此操作会永久删除全部本机数据</span></label>
+      </div>
+      <div class="bottom-action"><button class="danger-button">删除全部本机数据</button></div>
+    </section>
+  </template>
+
+  <script>
+    const template = document.querySelector('#phone-content');
+    document.querySelectorAll('.phone').forEach((phone) => {
+      phone.append(template.content.cloneNode(true));
+    });
+
+    document.querySelectorAll('[data-screen-target]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = button.dataset.screenTarget;
+        document.querySelectorAll('[data-screen-target]').forEach((item) => item.classList.toggle('active', item === button));
+        document.querySelectorAll('.screen').forEach((screen) => screen.classList.toggle('active', screen.dataset.screen === target));
+      });
+    });
+
+    document.querySelectorAll('[data-mode]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const isDark = button.dataset.mode === 'dark';
+        document.body.classList.toggle('dark', isDark);
+        document.querySelectorAll('[data-mode]').forEach((item) => item.classList.toggle('active', item === button));
+      });
+    });
+  </script>
+</body>
+</html>

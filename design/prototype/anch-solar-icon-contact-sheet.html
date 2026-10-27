@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>安册 Solar 图标样张</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --canvas: #f6f8f7;
+      --surface: #fff;
+      --soft: #edf2f0;
+      --text: #1b2423;
+      --text-2: #4b5b58;
+      --text-3: #687471;
+      --primary: #4f7773;
+      --primary-soft: #ddeae7;
+      --border: #d7dfdd;
+      --border-strong: #bcc8c5;
+      --success: #2f7656;
+      --success-soft: #dff0e7;
+      --warning: #8a6518;
+      --warning-soft: #f7ebc8;
+      --danger: #a34848;
+      --danger-soft: #f6e2e2;
+      --frame: #e7e9e8;
+      --shadow: 0 8px 28px rgba(27, 36, 35, .08);
+      --sample-size: 28px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --canvas: #111817;
+      --surface: #18211f;
+      --soft: #202b29;
+      --text: #e8efed;
+      --text-2: #b8c5c1;
+      --text-3: #8e9d99;
+      --primary: #85aaa5;
+      --primary-soft: #2b4a46;
+      --border: #34413f;
+      --border-strong: #4a5a57;
+      --success: #79c59e;
+      --success-soft: #1d3a2d;
+      --warning: #d9b75b;
+      --warning-soft: #403517;
+      --danger: #e09999;
+      --danger-soft: #472424;
+      --frame: #0b100f;
+      --shadow: none;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; color: var(--text); background: var(--frame); }
+    button { font: inherit; }
+
+    .page { width: min(1440px, 100%); margin: 0 auto; padding: 32px 28px 60px; }
+    .top { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+    h1 { margin: 0 0 8px; font-size: clamp(26px, 4vw, 38px); line-height: 1.15; letter-spacing: -.04em; font-weight: 650; }
+    .lead { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
+    .controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .control-group { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .control { min-height: 40px; padding: 0 13px; border: 0; border-radius: 8px; color: var(--text-2); background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .control.active { color: var(--primary); background: var(--primary-soft); }
+
+    .rules { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; padding: 16px; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--border); }
+    .rule { min-height: 82px; padding: 13px 14px; background: var(--surface); }
+    .rule strong { display: block; margin-bottom: 5px; font-size: 14px; }
+    .rule span { color: var(--text-2); font-size: 12px; line-height: 1.55; }
+
+    .section { margin-top: 22px; padding: 22px; border: 1px solid var(--border); border-radius: 16px; background: var(--canvas); box-shadow: var(--shadow); }
+    .section-heading { margin-bottom: 17px; display: flex; justify-content: space-between; gap: 20px; }
+    .section-heading h2 { margin: 0 0 5px; font-size: 19px; font-weight: 650; }
+    .section-heading p { margin: 0; color: var(--text-2); font-size: 13px; line-height: 1.55; }
+    .badge { align-self: flex-start; padding: 4px 8px; border-radius: 6px; color: var(--primary); background: var(--primary-soft); font-size: 10px; font-weight: 700; white-space: nowrap; }
+
+    .solar-icon { display: inline-grid; place-items: center; width: 1em; height: 1em; font-size: var(--sample-size); }
+    .solar-icon svg { display: block; width: 1em; height: 1em; }
+
+    .type-grid { display: grid; grid-template-columns: repeat(7, minmax(128px, 1fr)); gap: 10px; }
+    .type-card { position: relative; min-height: 154px; padding: 15px 10px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); text-align: center; }
+    .type-card.focus { border: 2px solid var(--primary); }
+    .type-card.focus::before { content: "重点修正"; position: absolute; top: 7px; right: 7px; padding: 2px 5px; border-radius: 5px; color: var(--primary); background: var(--primary-soft); font-size: 9px; font-weight: 700; }
+    .type-icon { width: 60px; height: 60px; display: grid; place-items: center; color: var(--primary); }
+    .type-name { margin-top: 6px; font-size: 13px; font-weight: 650; line-height: 1.35; }
+    .glyph-name { margin-top: 4px; color: var(--text-3); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 8px; line-height: 1.35; word-break: break-word; }
+
+    .comparison-grid { display: grid; grid-template-columns: repeat(5, minmax(210px, 1fr)); gap: 12px; }
+    .compare-group { padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .compare-group h3 { margin: 0 0 10px; font-size: 14px; font-weight: 650; }
+    .option { min-height: 61px; padding: 8px; display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 8px; border-top: 1px solid var(--border); }
+    .option .solar-icon { color: var(--text-2); font-size: 27px; }
+    .option strong { display: block; font-size: 12px; }
+    .option small { color: var(--text-3); font-size: 8px; }
+    .option.selected { margin: 0 -1px; color: var(--primary); background: var(--primary-soft); border-color: transparent; border-radius: 8px; }
+    .option.selected .solar-icon { color: var(--primary); }
+    .choice { color: var(--primary); font-size: 9px; font-weight: 700; }
+
+    .style-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .demo-panel { overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .demo-panel h3 { margin: 0; padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text-2); font-size: 12px; font-weight: 650; }
+    .demo-row { min-height: 62px; padding: 0 14px; display: grid; grid-template-columns: 42px 1fr auto; align-items: center; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .demo-row:last-child { border-bottom: 0; }
+    .demo-row .solar-icon { color: var(--text-2); font-size: 23px; }
+    .demo-row small { color: var(--text-3); font-size: 10px; }
+    .demo-row.danger .solar-icon { color: var(--danger); }
+
+    .nav { display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .nav-item { position: relative; min-height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; color: var(--text-2); font-size: 11px; }
+    .nav-item .solar-icon { font-size: 24px; }
+    .nav-item.active { color: var(--primary); font-weight: 650; }
+    .nav-item.active::before { content: ""; position: absolute; top: 0; width: 28px; height: 2px; background: var(--primary); }
+    .state-grid { margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .state { min-height: 70px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font-size: 12px; }
+    .state .solar-icon { font-size: 23px; }
+    .state.primary { color: var(--primary); background: var(--primary-soft); }
+    .state.success { color: var(--success); background: var(--success-soft); }
+    .state.warning { color: var(--warning); background: var(--warning-soft); }
+    .state.danger { color: var(--danger); background: var(--danger-soft); }
+
+    .decision { margin-top: 22px; padding: 18px 20px; border-left: 3px solid var(--primary); border-radius: 0 12px 12px 0; color: var(--text-2); background: var(--surface); font-size: 13px; line-height: 1.7; }
+    .decision strong { color: var(--text); }
+
+    @media (max-width: 1180px) {
+      .type-grid { grid-template-columns: repeat(4, 1fr); }
+      .comparison-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .page { padding: 22px 13px 40px; }
+      .top { align-items: stretch; flex-direction: column; }
+      .controls { justify-content: flex-start; }
+      .rules { grid-template-columns: repeat(2, 1fr); }
+      .section { padding: 16px 12px; }
+      .section-heading { flex-direction: column; }
+      .type-grid { grid-template-columns: repeat(2, 1fr); }
+      .comparison-grid, .style-demo { grid-template-columns: 1fr; }
+      .state-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <div><h1>安册 Solar 图标样张</h1><p class="lead">固定资源版本 1.2.5 · 资料类型 Bold Duotone · 功能操作 Linear · 全部本地加载</p></div>
+      <div class="controls">
+        <div class="control-group"><button class="control" data-size="24">24dp</button><button class="control active" data-size="28">28dp</button><button class="control" data-size="32">32dp</button></div>
+        <div class="control-group"><button class="control active" data-mode="light">亮色</button><button class="control" data-mode="dark">暗色</button></div>
+      </div>
+    </header>
+
+    <section class="rules">
+      <div class="rule"><strong>同一视觉家族</strong><span>所有图形来自 Solar，不再把 Phosphor、Material 或自绘图标混在页面里。</span></div>
+      <div class="rule"><strong>资料对象优先</strong><span>证件必须先像卡、册、护照或证明文件，再表达内部业务含义。</span></div>
+      <div class="rule"><strong>角色决定样式</strong><span>资料类型使用 Bold Duotone，操作使用 Linear，导航选中使用同形 Bold。</span></div>
+      <div class="rule"><strong>单色双层</strong><span>Duotone 只使用一个雾青色，第二层靠原始透明度建立层次，不引入彩色装饰。</span></div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><h2>14 类资料定稿建议</h2><p>户口本、护照、驾驶证、行驶证和结婚证已经从“概念图标”改为“资料对象图标”。</p></div><span class="badge">Bold Duotone</span></div>
+      <div class="type-grid">
+        <article class="type-card focus"><div class="type-icon" data-solar="user-id-bold-duotone"></div><div class="type-name">身份证</div><div class="glyph-name">user-id-bold-duotone</div></article>
+        <article class="type-card focus"><div class="type-icon" data-solar="notebook-bold-duotone"></div><div class="type-name">户口本</div><div class="glyph-name">notebook-bold-duotone</div></article>
+        <article class="type-card focus"><div class="type-icon" data-solar="passport-bold-duotone"></div><div class="type-name">护照</div><div class="glyph-name">passport-bold-duotone</div></article>
+        <article class="type-card focus"><div class="type-icon" data-solar="passport-minimalistic-bold-duotone"></div><div class="type-name">港澳通行证</div><div class="glyph-name">passport-minimalistic-bold-duotone</div></article>
+        <article class="type-card focus"><div class="type-icon" data-solar="card-2-bold-duotone"></div><div class="type-name">驾驶证</div><div class="glyph-name">card-2-bold-duotone</div></article>
+        <article class="type-card focus"><div class="type-icon" data-solar="document-text-bold-duotone"></div><div class="type-name">行驶证</div><div class="glyph-name">document-text-bold-duotone</div></article>
+        <article class="type-card"><div class="type-icon" data-solar="document-medicine-bold-duotone"></div><div class="type-name">出生医学证明</div><div class="glyph-name">document-medicine-bold-duotone</div></article>
+        <article class="type-card focus"><div class="type-icon" data-solar="clipboard-heart-bold-duotone"></div><div class="type-name">结婚证</div><div class="glyph-name">clipboard-heart-bold-duotone</div></article>
+        <article class="type-card"><div class="type-icon" data-solar="wallet-money-bold-duotone"></div><div class="type-name">储蓄卡</div><div class="glyph-name">wallet-money-bold-duotone</div></article>
+        <article class="type-card"><div class="type-icon" data-solar="card-bold-duotone"></div><div class="type-name">信用卡</div><div class="glyph-name">card-bold-duotone</div></article>
+        <article class="type-card"><div class="type-icon" data-solar="shield-user-bold-duotone"></div><div class="type-name">保险单</div><div class="glyph-name">shield-user-bold-duotone</div></article>
+        <article class="type-card"><div class="type-icon" data-solar="buildings-3-bold-duotone"></div><div class="type-name">不动产权证</div><div class="glyph-name">buildings-3-bold-duotone</div></article>
+        <article class="type-card"><div class="type-icon" data-solar="diploma-verified-bold-duotone"></div><div class="type-name">学历／学位证书</div><div class="glyph-name">diploma-verified-bold-duotone</div></article>
+        <article class="type-card"><div class="type-icon" data-solar="documents-minimalistic-bold-duotone"></div><div class="type-name">其他资料</div><div class="glyph-name">documents-minimalistic-bold-duotone</div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><h2>重点类型候选</h2><p>绿色底为推荐。候选仍保持 Solar Bold Duotone，不通过跨库图标补语义。</p></div></div>
+      <div class="comparison-grid">
+        <article class="compare-group"><h3>户口本</h3><div class="option selected"><span data-solar="notebook-bold-duotone"></span><span><strong>户籍册</strong><small>notebook</small></span><b class="choice">推荐</b></div><div class="option"><span data-solar="notebook-square-bold-duotone"></span><span><strong>方形资料册</strong><small>notebook-square</small></span></div><div class="option"><span data-solar="book-2-bold-duotone"></span><span><strong>普通书册</strong><small>book-2</small></span></div></article>
+        <article class="compare-group"><h3>港澳通行证</h3><div class="option selected"><span data-solar="passport-minimalistic-bold-duotone"></span><span><strong>旅行证件</strong><small>passport-minimalistic</small></span><b class="choice">推荐</b></div><div class="option"><span data-solar="card-2-bold-duotone"></span><span><strong>卡式证件</strong><small>card-2</small></span></div><div class="option"><span data-solar="user-id-bold-duotone"></span><span><strong>身份凭证</strong><small>user-id</small></span></div></article>
+        <article class="compare-group"><h3>驾驶证</h3><div class="option selected"><span data-solar="card-2-bold-duotone"></span><span><strong>卡式证件</strong><small>card-2</small></span><b class="choice">推荐</b></div><div class="option"><span data-solar="user-id-bold-duotone"></span><span><strong>身份凭证</strong><small>user-id</small></span></div><div class="option"><span data-solar="wheel-angle-bold-duotone"></span><span><strong>驾驶概念</strong><small>wheel-angle</small></span></div></article>
+        <article class="compare-group"><h3>结婚证</h3><div class="option selected"><span data-solar="clipboard-heart-bold-duotone"></span><span><strong>登记资料</strong><small>clipboard-heart</small></span><b class="choice">推荐</b></div><div class="option"><span data-solar="hearts-bold-duotone"></span><span><strong>关系概念</strong><small>hearts</small></span></div><div class="option"><span data-solar="diploma-bold-duotone"></span><span><strong>证明文件</strong><small>diploma</small></span></div></article>
+        <article class="compare-group"><h3>保险单</h3><div class="option selected"><span data-solar="shield-user-bold-duotone"></span><span><strong>个人保障</strong><small>shield-user</small></span><b class="choice">推荐</b></div><div class="option"><span data-solar="document-text-bold-duotone"></span><span><strong>保单文件</strong><small>document-text</small></span></div><div class="option"><span data-solar="diploma-verified-bold-duotone"></span><span><strong>认证凭证</strong><small>diploma-verified</small></span></div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><h2>通用操作与导航</h2><p>操作图标降低视觉重量使用 Linear；选中导航只切换相同图形的 Bold，不更换轮廓。</p></div><span class="badge">Linear／Bold</span></div>
+      <div class="style-demo">
+        <article class="demo-panel"><h3>常用操作 · Linear 22–24dp</h3><div class="demo-row"><span data-solar="add-circle-linear"></span><span>新增资料</span><small>add-circle</small></div><div class="demo-row"><span data-solar="pen-linear"></span><span>编辑</span><small>pen</small></div><div class="demo-row"><span data-solar="copy-linear"></span><span>复制</span><small>copy</small></div><div class="demo-row danger"><span data-solar="trash-bin-trash-linear"></span><span>删除</span><small>trash-bin-trash</small></div></article>
+        <article class="demo-panel"><h3>查找与安全 · Linear 22–24dp</h3><div class="demo-row"><span data-solar="magnifer-linear"></span><span>搜索</span><small>magnifer</small></div><div class="demo-row"><span data-solar="filter-linear"></span><span>筛选</span><small>filter</small></div><div class="demo-row"><span data-solar="archive-linear"></span><span>归档</span><small>archive</small></div><div class="demo-row"><span data-solar="lock-linear"></span><span>应用锁</span><small>lock</small></div></article>
+      </div>
+      <nav class="nav" aria-label="底部导航示例"><div class="nav-item active"><span data-solar="home-2-bold"></span><span>首页</span></div><div class="nav-item"><span data-solar="users-group-rounded-linear"></span><span>家庭</span></div><div class="nav-item"><span data-solar="folder-with-files-linear"></span><span>资料</span></div><div class="nav-item"><span data-solar="user-rounded-linear"></span><span>我的</span></div></nav>
+      <div class="state-grid"><div class="state primary"><span data-solar="lock-linear"></span><span>应用锁已开启</span></div><div class="state success"><span data-solar="check-circle-linear"></span><span>备份已完成</span></div><div class="state warning"><span data-solar="clock-circle-linear"></span><span>即将到期</span></div><div class="state danger"><span data-solar="shield-warning-linear"></span><span>不可逆操作</span></div></div>
+    </section>
+
+    <div class="decision"><strong>当前判断：</strong>Solar 解决了 Phosphor 样张最关键的语义问题。户口本呈现为独立资料册，护照有专属护照图形，驾驶证使用卡式证件，结婚证同时包含资料载体和关系符号；整体仍由同一套圆润几何和双层填充建立统一感。</div>
+  </main>
+
+  <script src="assets/solar/1.2.5/icons.js"></script>
+  <script>
+    function renderSolarIcons() {
+      const data = window.ANCH_SOLAR_ICONS;
+      document.querySelectorAll('[data-solar]').forEach((node) => {
+        const name = node.dataset.solar;
+        const icon = data.icons[name];
+        if (!icon) throw new Error(`Missing Solar icon: ${name}`);
+        node.classList.add('solar-icon');
+        node.innerHTML = `<svg viewBox="0 0 ${data.width || 24} ${data.height || 24}" aria-hidden="true" focusable="false">${icon.body}</svg>`;
+      });
+    }
+
+    renderSolarIcons();
+
+    const sizeButtons = document.querySelectorAll('[data-size]');
+    sizeButtons.forEach((button) => button.addEventListener('click', () => {
+      document.documentElement.style.setProperty('--sample-size', `${button.dataset.size}px`);
+      sizeButtons.forEach((item) => item.classList.toggle('active', item === button));
+    }));
+
+    const modeButtons = document.querySelectorAll('[data-mode]');
+    modeButtons.forEach((button) => button.addEventListener('click', () => {
+      document.body.classList.toggle('dark', button.dataset.mode === 'dark');
+      modeButtons.forEach((item) => item.classList.toggle('active', item === button));
+    }));
+
+    const params = new URLSearchParams(window.location.search);
+    const size = params.get('size');
+    if (['24', '28', '32'].includes(size)) {
+      document.documentElement.style.setProperty('--sample-size', `${size}px`);
+      sizeButtons.forEach((item) => item.classList.toggle('active', item.dataset.size === size));
+    }
+    if (params.get('mode') === 'dark') {
+      document.body.classList.add('dark');
+      modeButtons.forEach((item) => item.classList.toggle('active', item.dataset.mode === 'dark'));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+china-division 2.7.0
+
+Source: https://github.com/modood/Administrative-divisions-of-China
+Published package: https://registry.npmjs.org/china-division/-/china-division-2.7.0.tgz
+Revision: 6fb5380de7e6c961869dcd1629df4adc088fa9bb
+
+安册从该版本的 provinces.json、cities.json、areas.json 派生三级行政区名称、代码与父级树，数据截至 2023-06-30。以下保留实际发布包的 LICENSE 原文。包内 package.json 和 npm 元数据另声明 MIT，此处如实记录差异，不修改上游声明，也不以安册的 MIT 许可证替代它。
+
+        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
+
+ Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.

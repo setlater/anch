@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>安册 Phosphor 图标样张</title>
+  <link rel="stylesheet" href="assets/phosphor/2.1.2/regular/style.css" />
+  <link rel="stylesheet" href="assets/phosphor/2.1.2/fill/style.css" />
+  <style>
+    :root {
+      color-scheme: light;
+      --canvas: #f6f8f7;
+      --surface: #ffffff;
+      --surface-soft: #edf2f0;
+      --text: #1b2423;
+      --text-2: #4b5b58;
+      --text-3: #687471;
+      --primary: #4f7773;
+      --on-primary: #ffffff;
+      --primary-soft: #ddeae7;
+      --border: #d7dfdd;
+      --border-strong: #bcc8c5;
+      --success: #2f7656;
+      --success-soft: #dff0e7;
+      --warning: #8a6518;
+      --warning-soft: #f7ebc8;
+      --danger: #a34848;
+      --danger-soft: #f6e2e2;
+      --frame: #e7e9e8;
+      --shadow: 0 8px 28px rgba(27, 36, 35, .08);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --canvas: #111817;
+      --surface: #18211f;
+      --surface-soft: #202b29;
+      --text: #e8efed;
+      --text-2: #b8c5c1;
+      --text-3: #8e9d99;
+      --primary: #85aaa5;
+      --on-primary: #10211f;
+      --primary-soft: #2b4a46;
+      --border: #34413f;
+      --border-strong: #4a5a57;
+      --success: #79c59e;
+      --success-soft: #1d3a2d;
+      --warning: #d9b75b;
+      --warning-soft: #403517;
+      --danger: #e09999;
+      --danger-soft: #472424;
+      --frame: #0c100f;
+      --shadow: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--frame);
+      color: var(--text);
+      transition: background .2s, color .2s;
+    }
+
+    button { font: inherit; }
+
+    .page {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 32px 28px 60px;
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .title-wrap h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 4vw, 38px);
+      line-height: 1.15;
+      letter-spacing: -.04em;
+      font-weight: 650;
+    }
+
+    .title-wrap p {
+      margin: 0;
+      color: var(--text-2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .control {
+      min-height: 40px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 8px;
+      color: var(--text-2);
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .control.active {
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .summary {
+      margin-bottom: 22px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--border);
+    }
+
+    .summary-item {
+      min-height: 78px;
+      padding: 13px 14px;
+      background: var(--surface);
+    }
+
+    .summary-item strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .summary-item span {
+      color: var(--text-2);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--canvas);
+      box-shadow: var(--shadow);
+    }
+
+    .section-heading {
+      margin-bottom: 17px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .section-heading h2 {
+      margin: 0 0 5px;
+      font-size: 19px;
+      font-weight: 650;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-3);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 4px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(128px, 1fr));
+      gap: 10px;
+    }
+
+    .icon-card {
+      position: relative;
+      min-height: 142px;
+      padding: 13px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      text-align: center;
+    }
+
+    .icon-card.recommended {
+      border: 2px solid var(--primary);
+      background: var(--surface);
+    }
+
+    .icon-card.recommended::before {
+      content: "推荐";
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      padding: 2px 5px;
+      border-radius: 5px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .icon-box {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      color: var(--text-2);
+    }
+
+    .icon-card.recommended .icon-box { color: var(--primary); }
+
+    .icon-box i {
+      font-size: var(--sample-size, 24px);
+    }
+
+    .icon-label {
+      margin-top: 7px;
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 650;
+    }
+
+    .icon-name {
+      margin-top: 4px;
+      color: var(--text-3);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 9px;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .candidate-groups {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(210px, 1fr));
+      gap: 12px;
+    }
+
+    .candidate-group {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .candidate-group h3 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .candidate-row {
+      min-height: 54px;
+      padding: 7px 8px;
+      display: grid;
+      grid-template-columns: 38px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .candidate-row i {
+      color: var(--text-2);
+      font-size: var(--sample-size, 24px);
+      text-align: center;
+    }
+
+    .candidate-row strong {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .candidate-row small {
+      color: var(--text-3);
+      font-size: 9px;
+    }
+
+    .candidate-row.selected {
+      margin: 0 -1px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      border-color: transparent;
+      border-radius: 8px;
+    }
+
+    .candidate-row.selected i { color: var(--primary); }
+
+    .choice {
+      color: var(--primary);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .utility-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .utility-group {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .utility-group h3 {
+      margin: 0;
+      padding: 12px 13px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .utility-row {
+      min-height: 54px;
+      padding: 0 13px;
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .utility-row:last-child { border-bottom: 0; }
+    .utility-row i { color: var(--text-2); font-size: var(--sample-size, 22px); }
+    .utility-row.danger i { color: var(--danger); }
+    .utility-row.warning i { color: var(--warning); }
+    .utility-row.success i { color: var(--success); }
+
+    .nav-preview {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .nav-item {
+      position: relative;
+      min-height: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      color: var(--text-2);
+      font-size: 11px;
+    }
+
+    .nav-item i { font-size: var(--sample-size, 24px); }
+    .nav-item.active { color: var(--primary); font-weight: 650; }
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 28px;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .state-preview {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .state-item {
+      min-height: 68px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      font-size: 12px;
+    }
+
+    .state-item i { font-size: var(--sample-size, 22px); }
+    .state-item.primary { color: var(--primary); background: var(--primary-soft); }
+    .state-item.success { color: var(--success); background: var(--success-soft); }
+    .state-item.warning { color: var(--warning); background: var(--warning-soft); }
+    .state-item.danger { color: var(--danger); background: var(--danger-soft); }
+
+    .decision {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 3px solid var(--primary);
+      border-radius: 0 12px 12px 0;
+      background: var(--surface);
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .decision strong { color: var(--text); }
+
+    @media (max-width: 1180px) {
+      .icon-grid { grid-template-columns: repeat(4, 1fr); }
+      .candidate-groups { grid-template-columns: repeat(2, 1fr); }
+      .utility-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .page { padding: 22px 13px 40px; }
+      .top { align-items: stretch; flex-direction: column; }
+      .controls { justify-content: flex-start; }
+      .summary { grid-template-columns: repeat(2, 1fr); }
+      .section { padding: 16px 12px; }
+      .section-heading { flex-direction: column; }
+      .icon-grid { grid-template-columns: repeat(2, 1fr); }
+      .candidate-groups, .utility-grid { grid-template-columns: 1fr; }
+      .state-preview { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <div class="title-wrap">
+        <h1>安册 Phosphor 图标样张</h1>
+        <p>固定资源版本 2.1.2 · 默认 Regular · 仅导航选中态使用 Fill · 全部本地加载</p>
+      </div>
+      <div class="controls" aria-label="样张控制">
+        <div class="control-group">
+          <button class="control active" data-size="20">20dp</button>
+          <button class="control" data-size="24">24dp</button>
+          <button class="control" data-size="32">32dp</button>
+        </div>
+        <div class="control-group">
+          <button class="control active" data-mode="light">亮色</button>
+          <button class="control" data-mode="dark">暗色</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="summary">
+      <div class="summary-item"><strong>唯一视觉母体</strong><span>所有图标来自 Phosphor 2.1.2，不混用 Material、Lucide 或 Iconoir。</span></div>
+      <div class="summary-item"><strong>默认字重</strong><span>页面和资料图标统一 Regular，避免 Thin 在小尺寸下发虚。</span></div>
+      <div class="summary-item"><strong>颜色规则</strong><span>默认使用次级文字色，选中才用雾青，语义色只表达状态。</span></div>
+      <div class="summary-item"><strong>容器规则</strong><span>资料图标不放彩色圆底，不通过装饰制造分类差异。</span></div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div><h2>资料类型定稿建议</h2><p>全部在相同容器、尺寸和颜色下对比，减少图标自身以外的视觉干扰。</p></div>
+        <div class="legend"><span><i></i>推荐描边</span><span>其余为直接定稿</span></div>
+      </div>
+      <div class="icon-grid">
+        <article class="icon-card recommended"><div class="icon-box"><i class="ph ph-identification-card"></i></div><div class="icon-label">身份证</div><div class="icon-name">identification-card</div></article>
+        <article class="icon-card recommended"><div class="icon-box"><i class="ph ph-address-book"></i></div><div class="icon-label">户口本</div><div class="icon-name">address-book</div></article>
+        <article class="icon-card recommended"><div class="icon-box"><i class="ph ph-book-open-text"></i></div><div class="icon-label">护照</div><div class="icon-name">book-open-text</div></article>
+        <article class="icon-card recommended"><div class="icon-box"><i class="ph ph-identification-badge"></i></div><div class="icon-label">港澳通行证</div><div class="icon-name">identification-badge</div></article>
+        <article class="icon-card"><div class="icon-box"><i class="ph ph-steering-wheel"></i></div><div class="icon-label">驾驶证</div><div class="icon-name">steering-wheel</div></article>
+        <article class="icon-card"><div class="icon-box"><i class="ph ph-car-profile"></i></div><div class="icon-label">行驶证</div><div class="icon-name">car-profile</div></article>
+        <article class="icon-card recommended"><div class="icon-box"><i class="ph ph-baby"></i></div><div class="icon-label">出生医学证明</div><div class="icon-name">baby</div></article>
+        <article class="icon-card recommended"><div class="icon-box"><i class="ph ph-certificate"></i></div><div class="icon-label">结婚证</div><div class="icon-name">certificate</div></article>
+        <article class="icon-card"><div class="icon-box"><i class="ph ph-bank"></i></div><div class="icon-label">储蓄卡</div><div class="icon-name">bank</div></article>
+        <article class="icon-card"><div class="icon-box"><i class="ph ph-credit-card"></i></div><div class="icon-label">信用卡</div><div class="icon-name">credit-card</div></article>
+        <article class="icon-card recommended"><div class="icon-box"><i class="ph ph-umbrella"></i></div><div class="icon-label">保险单</div><div class="icon-name">umbrella</div></article>
+        <article class="icon-card"><div class="icon-box"><i class="ph ph-house-line"></i></div><div class="icon-label">不动产权证</div><div class="icon-name">house-line</div></article>
+        <article class="icon-card"><div class="icon-box"><i class="ph ph-graduation-cap"></i></div><div class="icon-label">学历／学位证书</div><div class="icon-name">graduation-cap</div></article>
+        <article class="icon-card"><div class="icon-box"><i class="ph ph-file-text"></i></div><div class="icon-label">其他资料</div><div class="icon-name">file-text</div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><h2>五类待确认候选</h2><p>绿色底为当前推荐；候选全部来自同一 Phosphor Regular 字体，不存在跨库风格偏差。</p></div></div>
+      <div class="candidate-groups">
+        <article class="candidate-group"><h3>户口本</h3><div class="candidate-row selected"><i class="ph ph-address-book"></i><span><strong>户籍资料册</strong><small>address-book</small></span><span class="choice">推荐</span></div><div class="candidate-row"><i class="ph ph-book-open-user"></i><span><strong>成员资料</strong><small>book-open-user</small></span></div><div class="candidate-row"><i class="ph ph-book"></i><span><strong>普通书册</strong><small>book</small></span></div></article>
+        <article class="candidate-group"><h3>护照</h3><div class="candidate-row selected"><i class="ph ph-book-open-text"></i><span><strong>证件册页</strong><small>book-open-text</small></span><span class="choice">推荐</span></div><div class="candidate-row"><i class="ph ph-globe-hemisphere-east"></i><span><strong>国际属性</strong><small>globe-hemisphere-east</small></span></div><div class="candidate-row"><i class="ph ph-identification-card"></i><span><strong>身份证明</strong><small>identification-card</small></span></div></article>
+        <article class="candidate-group"><h3>出生医学证明</h3><div class="candidate-row selected"><i class="ph ph-baby"></i><span><strong>出生语义</strong><small>baby</small></span><span class="choice">推荐</span></div><div class="candidate-row"><i class="ph ph-certificate"></i><span><strong>证明文件</strong><small>certificate</small></span></div><div class="candidate-row"><i class="ph ph-file-text"></i><span><strong>普通文件</strong><small>file-text</small></span></div></article>
+        <article class="candidate-group"><h3>结婚证</h3><div class="candidate-row selected"><i class="ph ph-certificate"></i><span><strong>登记证明</strong><small>certificate</small></span><span class="choice">推荐</span></div><div class="candidate-row"><i class="ph ph-seal-check"></i><span><strong>认证结果</strong><small>seal-check</small></span></div><div class="candidate-row"><i class="ph ph-heart"></i><span><strong>关系情感</strong><small>heart</small></span></div></article>
+        <article class="candidate-group"><h3>保险单</h3><div class="candidate-row selected"><i class="ph ph-umbrella"></i><span><strong>风险保障</strong><small>umbrella</small></span><span class="choice">推荐</span></div><div class="candidate-row"><i class="ph ph-shield-check"></i><span><strong>安全保障</strong><small>shield-check</small></span></div><div class="candidate-row"><i class="ph ph-file-text"></i><span><strong>保单文件</strong><small>file-text</small></span></div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><h2>导航与交互图标</h2><p>通用操作同样进入统一注册表，页面不再临时选择 Material 图标。</p></div></div>
+      <div class="utility-grid">
+        <article class="utility-group"><h3>主要导航</h3><div class="utility-row"><i class="ph ph-house"></i><span>首页</span></div><div class="utility-row"><i class="ph ph-users"></i><span>家庭</span></div><div class="utility-row"><i class="ph ph-folders"></i><span>资料</span></div><div class="utility-row"><i class="ph ph-user"></i><span>我的</span></div></article>
+        <article class="utility-group"><h3>编辑操作</h3><div class="utility-row"><i class="ph ph-plus"></i><span>新增</span></div><div class="utility-row"><i class="ph ph-pencil-simple"></i><span>编辑</span></div><div class="utility-row"><i class="ph ph-copy"></i><span>复制</span></div><div class="utility-row danger"><i class="ph ph-trash"></i><span>删除</span></div></article>
+        <article class="utility-group"><h3>查找与状态</h3><div class="utility-row"><i class="ph ph-magnifying-glass"></i><span>搜索</span></div><div class="utility-row"><i class="ph ph-funnel"></i><span>筛选</span></div><div class="utility-row"><i class="ph ph-eye"></i><span>查看</span></div><div class="utility-row"><i class="ph ph-eye-slash"></i><span>隐藏</span></div></article>
+        <article class="utility-group"><h3>数据与安全</h3><div class="utility-row"><i class="ph ph-archive-box"></i><span>归档</span></div><div class="utility-row"><i class="ph ph-upload-simple"></i><span>创建备份</span></div><div class="utility-row"><i class="ph ph-download-simple"></i><span>恢复备份</span></div><div class="utility-row"><i class="ph ph-lock"></i><span>应用锁</span></div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading"><div><h2>选中与语义状态</h2><p>Fill 只表达导航选中；成功、警告、危险依靠同一 Regular 图形配合文字，不用分类颜色装饰。</p></div></div>
+      <nav class="nav-preview" aria-label="底部导航示例"><div class="nav-item active"><i class="ph-fill ph-house"></i><span>首页</span></div><div class="nav-item"><i class="ph ph-users"></i><span>家庭</span></div><div class="nav-item"><i class="ph ph-folders"></i><span>资料</span></div><div class="nav-item"><i class="ph ph-user"></i><span>我的</span></div></nav>
+      <div class="state-preview"><div class="state-item primary"><i class="ph ph-lock"></i><span>应用锁已开启</span></div><div class="state-item success"><i class="ph ph-check-circle"></i><span>备份已完成</span></div><div class="state-item warning"><i class="ph ph-clock"></i><span>即将到期</span></div><div class="state-item danger"><i class="ph ph-warning"></i><span>不可逆操作</span></div></div>
+    </section>
+
+    <div class="decision"><strong>当前建议：</strong>直接定稿 9 类，保留 5 类候选供整体观察。若护照、户口本等在 20dp 下仍难以区分，应先通过文字和列表结构补足语义；只有确认现有 Phosphor 图形确实无法满足时，才进入相同网格的补绘，不在第一轮混入其他图标库。</div>
+  </main>
+
+  <script>
+    const sizeButtons = document.querySelectorAll('[data-size]');
+    sizeButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        document.documentElement.style.setProperty('--sample-size', `${button.dataset.size}px`);
+        sizeButtons.forEach((item) => item.classList.toggle('active', item === button));
+      });
+    });
+
+    const modeButtons = document.querySelectorAll('[data-mode]');
+    modeButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        document.body.classList.toggle('dark', button.dataset.mode === 'dark');
+        modeButtons.forEach((item) => item.classList.toggle('active', item === button));
+      });
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const initialSize = params.get('size');
+    const initialMode = params.get('mode');
+    if (initialSize && ['20', '24', '32'].includes(initialSize)) {
+      document.documentElement.style.setProperty('--sample-size', `${initialSize}px`);
+      sizeButtons.forEach((item) => item.classList.toggle('active', item.dataset.size === initialSize));
+    }
+    if (initialMode === 'dark') {
+      document.body.classList.add('dark');
+      modeButtons.forEach((item) => item.classList.toggle('active', item.dataset.mode === 'dark'));
+    }
+  </script>
+</body>
+</html>

@@ -13,6 +13,8 @@ fvm flutter analyze
 fvm flutter test
 ```
 
+GitHub Actions 在 `main` 推送和 PR 时运行静态分析、完整测试与 ARM64 贡献者 Debug 构建，使用 `.fvmrc` 中的固定 Flutter 版本及 JDK 17。工作流只读取仓库，不接入维护者签名、密钥或自动发行；CI 构建不是正式安装包，不能替代真机验证与发行准入。
+
 ## 贡献者应用
 
 显式启用贡献者入口，不需要维护者的私有签名文件：

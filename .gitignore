@@ -1,4 +1,5 @@
 # Miscellaneous
+.tmp/
 .env*
 .codex/
 .agents/

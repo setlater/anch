@@ -69,6 +69,8 @@ GitHub 仓库为 [setlater/anch](https://github.com/setlater/anch) ，普通问�
 
 | 内容 | 阅读入口 |
 | --- | --- |
+| 日常使用、备份操作、换机与常见问题 | [使用说明](docs/user-guide.md) |
+| 本机数据处理、主动外发与第三方网页访问 | [隐私说明](docs/privacy.md) |
 | 模块边界、数据流与设计取舍 | [架构](docs/architecture.md) |
 | 密钥、应用锁、敏感状态与权限 | [安全](docs/security.md) |
 | V3 格式、历史兼容与原子恢复 | [备份格式](docs/backup-format.md) |
